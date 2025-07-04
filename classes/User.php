@@ -21,6 +21,11 @@ class User {
     public $notify_1_day_before;
     public $notify_on_due_date;
     public $notify_1_day_after_due;
+    // Novas propriedades para período de teste e assinatura
+    public $trial_starts_at;
+    public $trial_ends_at;
+    public $subscription_status;
+    public $plan_expires_at;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -34,7 +39,11 @@ class User {
                       notify_2_days_before=:notify_2_days_before,
                       notify_1_day_before=:notify_1_day_before,
                       notify_on_due_date=:notify_on_due_date,
-                      notify_1_day_after_due=:notify_1_day_after_due";
+                      notify_1_day_after_due=:notify_1_day_after_due,
+                      trial_starts_at=:trial_starts_at,
+                      trial_ends_at=:trial_ends_at,
+                      subscription_status=:subscription_status,
+                      plan_expires_at=:plan_expires_at";
         
         $stmt = $this->conn->prepare($query);
         
@@ -45,13 +54,19 @@ class User {
             $this->role = 'user';
         }
         
-        // Definir valores padrão para as novas colunas
+        // Definir valores padrão para as configurações de notificação
         $this->notify_5_days_before = $this->notify_5_days_before ?? false;
         $this->notify_3_days_before = $this->notify_3_days_before ?? true;
         $this->notify_2_days_before = $this->notify_2_days_before ?? false;
         $this->notify_1_day_before = $this->notify_1_day_before ?? false;
         $this->notify_on_due_date = $this->notify_on_due_date ?? true;
         $this->notify_1_day_after_due = $this->notify_1_day_after_due ?? false;
+
+        // Definir período de teste de 3 dias para novos usuários
+        $this->trial_starts_at = date('Y-m-d H:i:s');
+        $this->trial_ends_at = date('Y-m-d H:i:s', strtotime('+3 days'));
+        $this->subscription_status = 'trial';
+        $this->plan_expires_at = $this->trial_ends_at; // O plano expira junto com o teste
 
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
@@ -65,6 +80,10 @@ class User {
         $stmt->bindParam(":notify_1_day_before", $this->notify_1_day_before, PDO::PARAM_BOOL);
         $stmt->bindParam(":notify_on_due_date", $this->notify_on_due_date, PDO::PARAM_BOOL);
         $stmt->bindParam(":notify_1_day_after_due", $this->notify_1_day_after_due, PDO::PARAM_BOOL);
+        $stmt->bindParam(":trial_starts_at", $this->trial_starts_at);
+        $stmt->bindParam(":trial_ends_at", $this->trial_ends_at);
+        $stmt->bindParam(":subscription_status", $this->subscription_status);
+        $stmt->bindParam(":plan_expires_at", $this->plan_expires_at);
         
         if($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
@@ -80,8 +99,9 @@ class User {
         error_log("Provided password: " . $password);
         
         $query = "SELECT id, name, email, password, plan_id, role, whatsapp_instance, whatsapp_connected,
-                         notify_5_days_before, notify_3_days_before, notify_2_days_before,
-                         notify_1_day_before, notify_on_due_date, notify_1_day_after_due
+                         notify_5_days_before, notify_3_days_before, notify_2_days_before, notify_1_day_before,
+                         notify_on_due_date, notify_1_day_after_due, trial_starts_at, trial_ends_at,
+                         subscription_status, plan_expires_at
                   FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
         
         $stmt = $this->conn->prepare($query);
@@ -115,6 +135,11 @@ class User {
                 $this->notify_1_day_before = (bool)($row['notify_1_day_before'] ?? false);
                 $this->notify_on_due_date = (bool)($row['notify_on_due_date'] ?? true);
                 $this->notify_1_day_after_due = (bool)($row['notify_1_day_after_due'] ?? false);
+                // Carregar informações de assinatura e teste
+                $this->trial_starts_at = $row['trial_starts_at'];
+                $this->trial_ends_at = $row['trial_ends_at'];
+                $this->subscription_status = $row['subscription_status'];
+                $this->plan_expires_at = $row['plan_expires_at'];
 
                 error_log("Login successful for user ID: " . $this->id . ", Role: " . $this->role);
                 return true;
@@ -137,8 +162,9 @@ class User {
     public function readAll() {
         // Modificado para incluir as novas colunas
         $query = "SELECT id, name, email, plan_id, role, whatsapp_instance, whatsapp_connected,
-                         notify_5_days_before, notify_3_days_before, notify_2_days_before,
-                         notify_1_day_before, notify_on_due_date, notify_1_day_after_due
+                         notify_5_days_before, notify_3_days_before, notify_2_days_before, notify_1_day_before,
+                         notify_on_due_date, notify_1_day_after_due, trial_starts_at, trial_ends_at,
+                         subscription_status, plan_expires_at
                   FROM " . $this->table_name . " 
                   WHERE whatsapp_instance IS NOT NULL AND whatsapp_connected = 1
                   ORDER BY id ASC";
@@ -256,6 +282,129 @@ class User {
         $stmt->bindParam(":id", $user_id);
         
         return $stmt->execute();
+    }
+
+    // Novos métodos para gerenciar assinatura e período de teste
+    
+    /**
+     * Verificar se o usuário está em período de teste
+     */
+    public function isInTrial() {
+        return $this->subscription_status === 'trial';
+    }
+
+    /**
+     * Verificar se o período de teste expirou
+     */
+    public function isTrialExpired() {
+        if (!$this->isInTrial()) {
+            return false;
+        }
+        
+        $now = new DateTime();
+        $trial_end = new DateTime($this->trial_ends_at);
+        
+        return $now > $trial_end;
+    }
+
+    /**
+     * Verificar se o plano está ativo (não expirado)
+     */
+    public function isPlanActive() {
+        if ($this->subscription_status === 'active') {
+            return true;
+        }
+        
+        if ($this->subscription_status === 'trial') {
+            return !$this->isTrialExpired();
+        }
+        
+        return false;
+    }
+
+    /**
+     * Obter dias restantes do período de teste
+     */
+    public function getTrialDaysRemaining() {
+        if (!$this->isInTrial()) {
+            return 0;
+        }
+        
+        $now = new DateTime();
+        $trial_end = new DateTime($this->trial_ends_at);
+        
+        if ($now > $trial_end) {
+            return 0;
+        }
+        
+        $diff = $now->diff($trial_end);
+        return $diff->days;
+    }
+
+    /**
+     * Ativar assinatura paga (após pagamento)
+     */
+    public function activateSubscription($plan_id, $expires_at = null) {
+        // Se não especificar data de expiração, definir para 30 dias
+        if (!$expires_at) {
+            $expires_at = date('Y-m-d H:i:s', strtotime('+30 days'));
+        }
+        
+        $query = "UPDATE " . $this->table_name . " 
+                  SET subscription_status = 'active',
+                      plan_id = :plan_id,
+                      plan_expires_at = :plan_expires_at
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':plan_id', $plan_id);
+        $stmt->bindParam(':plan_expires_at', $expires_at);
+        $stmt->bindParam(':id', $this->id);
+        
+        if ($stmt->execute()) {
+            $this->subscription_status = 'active';
+            $this->plan_id = $plan_id;
+            $this->plan_expires_at = $expires_at;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Expirar assinatura (quando não pagar)
+     */
+    public function expireSubscription() {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET subscription_status = 'expired'
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        
+        if ($stmt->execute()) {
+            $this->subscription_status = 'expired';
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Obter informações completas da assinatura
+     */
+    public function getSubscriptionInfo() {
+        return [
+            'status' => $this->subscription_status,
+            'plan_id' => $this->plan_id,
+            'trial_starts_at' => $this->trial_starts_at,
+            'trial_ends_at' => $this->trial_ends_at,
+            'plan_expires_at' => $this->plan_expires_at,
+            'is_in_trial' => $this->isInTrial(),
+            'is_trial_expired' => $this->isTrialExpired(),
+            'is_plan_active' => $this->isPlanActive(),
+            'trial_days_remaining' => $this->getTrialDaysRemaining()
+        ];
     }
 }
 ?>

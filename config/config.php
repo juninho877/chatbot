@@ -12,7 +12,7 @@ define('MERCADO_PAGO_ACCESS_TOKEN', 'SEU_ACCESS_TOKEN_AQUI');
 define('MERCADO_PAGO_PUBLIC_KEY', 'SEU_PUBLIC_KEY_AQUI');
 
 // Configurações gerais
-define('SITE_URL', 'http://localhost');
+define('SITE_URL', 'https://apiteste.streamingplay.site');
 
 // Configurações de sessão
 if (session_status() == PHP_SESSION_NONE) {

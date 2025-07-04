@@ -45,13 +45,13 @@ $plan = $stmt->fetch(PDO::FETCH_ASSOC);
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo SITE_NAME; ?> - Registro</title>
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">

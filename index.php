@@ -6,11 +6,43 @@ require_once 'config/database.php';
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo SITE_NAME; ?> - Automatize sua Gestão de Clientes</title>
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos para o menu mobile */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 50;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mobile-menu.open {
+            display: flex;
+        }
+        
+        .mobile-menu a {
+            color: white;
+            font-size: 1.25rem;
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .mobile-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
@@ -22,22 +54,38 @@ require_once 'config/database.php';
                         <h1 class="text-2xl font-bold text-blue-600"><?php echo SITE_NAME; ?></h1>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                <!-- Menu para desktop -->
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="login.php" class="text-gray-500 hover:text-gray-700">Login</a>
                     <a href="register.php" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Começar Agora</a>
                 </div>
+                <!-- Botão do menu mobile -->
+                <div class="flex md:hidden items-center">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
             </div>
         </nav>
+        
+        <!-- Menu mobile -->
+        <div id="mobile-menu" class="mobile-menu">
+            <button id="close-menu-button" class="absolute top-4 right-4 text-white focus:outline-none">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <a href="login.php" class="hover:bg-blue-700">Login</a>
+            <a href="register.php" class="bg-blue-600 hover:bg-blue-700 my-2">Começar Agora</a>
+        </div>
     </header>
 
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <div class="text-center">
-                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                <h1 class="text-3xl md:text-6xl font-bold mb-6">
                     Automatize sua Gestão de Clientes com WhatsApp
                 </h1>
-                <p class="text-xl md:text-2xl mb-8 text-blue-100">
+                <p class="text-lg md:text-2xl mb-8 text-blue-100">
                     Gerencie clientes, envie cobranças automáticas e aumente sua produtividade com nossa plataforma SaaS
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -55,7 +103,7 @@ require_once 'config/database.php';
     <!-- Features Section -->
     <section id="features" class="py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-10 md:mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                     Funcionalidades Poderosas
                 </h2>
@@ -65,7 +113,7 @@ require_once 'config/database.php';
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fas fa-users text-blue-600 text-xl"></i>
                     </div>
@@ -75,7 +123,7 @@ require_once 'config/database.php';
                     </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fab fa-whatsapp text-green-600 text-xl"></i>
                     </div>
@@ -85,7 +133,7 @@ require_once 'config/database.php';
                     </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fas fa-chart-bar text-purple-600 text-xl"></i>
                     </div>
@@ -95,7 +143,7 @@ require_once 'config/database.php';
                     </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fas fa-qrcode text-yellow-600 text-xl"></i>
                     </div>
@@ -105,7 +153,7 @@ require_once 'config/database.php';
                     </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fas fa-template text-red-600 text-xl"></i>
                     </div>
@@ -115,7 +163,7 @@ require_once 'config/database.php';
                     </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-6">
                         <i class="fas fa-shield-alt text-indigo-600 text-xl"></i>
                     </div>
@@ -131,7 +179,7 @@ require_once 'config/database.php';
     <!-- Pricing Section -->
     <section class="bg-gray-100 py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-10 md:mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                     Planos que Cabem no seu Bolso
                 </h2>
@@ -142,7 +190,7 @@ require_once 'config/database.php';
 
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Plano Básico -->
-                <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
                     <div class="text-center">
                         <h3 class="text-2xl font-bold text-gray-900 mb-4">Básico</h3>
                         <div class="mb-6">
@@ -174,7 +222,7 @@ require_once 'config/database.php';
                 </div>
 
                 <!-- Plano Profissional -->
-                <div class="bg-white rounded-xl shadow-lg p-8 border-2 border-blue-500 relative">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 border-2 border-blue-500 relative">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
                         <span class="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Mais Popular</span>
                     </div>
@@ -213,7 +261,7 @@ require_once 'config/database.php';
                 </div>
 
                 <!-- Plano Empresarial -->
-                <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
                     <div class="text-center">
                         <h3 class="text-2xl font-bold text-gray-900 mb-4">Empresarial</h3>
                         <div class="mb-6">
@@ -269,7 +317,7 @@ require_once 'config/database.php';
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="text-xl font-bold mb-4"><?php echo SITE_NAME; ?></h3>
                     <p class="text-gray-400">
@@ -306,5 +354,24 @@ require_once 'config/database.php';
             </div>
         </div>
     </footer>
+    
+    <script>
+        // Script para controlar o menu mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Impedir rolagem
+            });
+            
+            closeMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('open');
+                document.body.style.overflow = ''; // Restaurar rolagem
+            });
+        });
+    </script>
 </body>
 </html>

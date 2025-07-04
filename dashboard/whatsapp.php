@@ -35,6 +35,22 @@ $message = '';
 $error = '';
 $qr_code = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['qr_code'])) {
+    $qr_code = $_SESSION['qr_code'];
+    unset($_SESSION['qr_code']); // Limpar da sessão após usar
+}
+
 // Gerar nome da instância baseado no nome do usuário
 $user = new User($db);
 $user->id = $_SESSION['user_id'];
@@ -222,11 +238,20 @@ if ($_POST) {
                         if ($final_state === 'open') {
                             $user->updateWhatsAppConnectedStatus(true);
                             $_SESSION['whatsapp_connected'] = true;
-                            $message = "WhatsApp conectado com sucesso! Sua automação está funcionando.";
-                            $error = '';
+                            $_SESSION['message'] = "WhatsApp conectado com sucesso! Sua automação está funcionando.";
+                        } else {
+                            // Se não conectou ainda, armazenar QR code na sessão
+                            if ($qr_generated) {
+                                $_SESSION['message'] = $temp_message;
+                                $_SESSION['qr_code'] = $qr_code;
+                            } else {
+                                $_SESSION['error'] = $temp_error ?: "Erro desconhecido ao conectar WhatsApp.";
+                            }
                         }
                     }
                     
+                    // Redirecionar para evitar reenvio
+                    redirect("whatsapp.php");
                     break;
                     
                 case 'disconnect_whatsapp':
@@ -244,14 +269,17 @@ if ($_POST) {
                         $_SESSION['whatsapp_instance'] = null;
                         $_SESSION['whatsapp_connected'] = false;
                         
-                        $message = "WhatsApp desconectado com sucesso!";
+                        $_SESSION['message'] = "WhatsApp desconectado com sucesso!";
                         
                     } else {
-                        $error = "Erro ao desconectar WhatsApp. Tente novamente.";
+                        $_SESSION['error'] = "Erro ao desconectar WhatsApp. Tente novamente.";
                         if (isset($result['data']['message'])) {
-                            $error .= " - " . $result['data']['message'];
+                            $_SESSION['error'] .= " - " . $result['data']['message'];
                         }
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("whatsapp.php");
                     break;
                     
                 case 'refresh_qr':
@@ -275,19 +303,24 @@ if ($_POST) {
                                 $qr_code = $qr_base64;
                             }
                             
-                            $message = "QR Code atualizado!";
+                            $_SESSION['message'] = "QR Code atualizado!";
+                            $_SESSION['qr_code'] = $qr_code;
                         } else {
-                            $error = "Erro ao atualizar QR Code.";
+                            $_SESSION['error'] = "Erro ao atualizar QR Code.";
                         }
                     } else {
-                        $error = "Nenhuma instância encontrada. Conecte o WhatsApp primeiro.";
+                        $_SESSION['error'] = "Nenhuma instância encontrada. Conecte o WhatsApp primeiro.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("whatsapp.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
         error_log("WhatsApp action error: " . $e->getMessage());
+        redirect("whatsapp.php");
     }
 }
 

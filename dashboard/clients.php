@@ -9,6 +9,17 @@ $client = new Client($db);
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Verificar se é administrador
 $is_admin = ($_SESSION['user_role'] === 'admin');
 
@@ -34,15 +45,18 @@ if ($_POST) {
                     // Validar dados
                     $validation_errors = $client->validate();
                     if (!empty($validation_errors)) {
-                        $error = implode(', ', $validation_errors);
-                        break;
+                        $_SESSION['error'] = implode(', ', $validation_errors);
+                        redirect("clients.php");
                     }
                     
                     if ($client->create()) {
-                        $message = "Cliente adicionado com sucesso!";
+                        $_SESSION['message'] = "Cliente adicionado com sucesso!";
                     } else {
-                        $error = "Erro ao adicionar cliente.";
+                        $_SESSION['error'] = "Erro ao adicionar cliente.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("clients.php");
                     break;
                     
                 case 'edit':
@@ -63,15 +77,18 @@ if ($_POST) {
                     // Validar dados
                     $validation_errors = $client->validate();
                     if (!empty($validation_errors)) {
-                        $error = implode(', ', $validation_errors);
-                        break;
+                        $_SESSION['error'] = implode(', ', $validation_errors);
+                        redirect("clients.php");
                     }
                     
                     if ($client->update()) {
-                        $message = "Cliente atualizado com sucesso!";
+                        $_SESSION['message'] = "Cliente atualizado com sucesso!";
                     } else {
-                        $error = "Erro ao atualizar cliente.";
+                        $_SESSION['error'] = "Erro ao atualizar cliente.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("clients.php");
                     break;
                     
                 case 'delete':
@@ -79,10 +96,13 @@ if ($_POST) {
                     $client->user_id = $_SESSION['user_id'];
                     
                     if ($client->delete()) {
-                        $message = "Cliente removido com sucesso!";
+                        $_SESSION['message'] = "Cliente removido com sucesso!";
                     } else {
-                        $error = "Erro ao remover cliente.";
+                        $_SESSION['error'] = "Erro ao remover cliente.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("clients.php");
                     break;
                     
                 case 'mark_payment':
@@ -91,18 +111,22 @@ if ($_POST) {
                     
                     if ($client->readOne()) {
                         if ($client->markPaymentReceived()) {
-                            $message = "Pagamento marcado como recebido!";
+                            $_SESSION['message'] = "Pagamento marcado como recebido!";
                         } else {
-                            $error = "Erro ao marcar pagamento.";
+                            $_SESSION['error'] = "Erro ao marcar pagamento.";
                         }
                     } else {
-                        $error = "Cliente não encontrado.";
+                        $_SESSION['error'] = "Cliente não encontrado.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("clients.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("clients.php");
     }
 }
 

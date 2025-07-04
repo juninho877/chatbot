@@ -33,6 +33,17 @@ if (isset($_SESSION['user_role'])) {
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -46,20 +57,23 @@ if ($_POST) {
                     $template->active = isset($_POST['active']) ? 1 : 0;
                     
                     if (empty($template->name)) {
-                        $error = "Nome do template é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Nome do template é obrigatório.";
+                        redirect("templates.php");
                     }
                     
                     if (empty($template->message)) {
-                        $error = "Mensagem do template é obrigatória.";
-                        break;
+                        $_SESSION['error'] = "Mensagem do template é obrigatória.";
+                        redirect("templates.php");
                     }
                     
                     if ($template->create()) {
-                        $message = "Template criado com sucesso!";
+                        $_SESSION['message'] = "Template criado com sucesso!";
                     } else {
-                        $error = "Erro ao criar template.";
+                        $_SESSION['error'] = "Erro ao criar template.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("templates.php");
                     break;
                     
                 case 'edit':
@@ -71,20 +85,23 @@ if ($_POST) {
                     $template->active = isset($_POST['active']) ? 1 : 0;
                     
                     if (empty($template->name)) {
-                        $error = "Nome do template é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Nome do template é obrigatório.";
+                        redirect("templates.php");
                     }
                     
                     if (empty($template->message)) {
-                        $error = "Mensagem do template é obrigatória.";
-                        break;
+                        $_SESSION['error'] = "Mensagem do template é obrigatória.";
+                        redirect("templates.php");
                     }
                     
                     if ($template->update()) {
-                        $message = "Template atualizado com sucesso!";
+                        $_SESSION['message'] = "Template atualizado com sucesso!";
                     } else {
-                        $error = "Erro ao atualizar template.";
+                        $_SESSION['error'] = "Erro ao atualizar template.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("templates.php");
                     break;
                     
                 case 'delete':
@@ -92,15 +109,19 @@ if ($_POST) {
                     $template->user_id = $_SESSION['user_id'];
                     
                     if ($template->delete()) {
-                        $message = "Template removido com sucesso!";
+                        $_SESSION['message'] = "Template removido com sucesso!";
                     } else {
-                        $error = "Erro ao remover template.";
+                        $_SESSION['error'] = "Erro ao remover template.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("templates.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("templates.php");
     }
 }
 

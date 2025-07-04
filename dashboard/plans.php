@@ -15,6 +15,17 @@ $plan = new Plan($db);
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -41,15 +52,18 @@ if ($_POST) {
                     // Validar dados
                     $validation_errors = $plan->validate();
                     if (!empty($validation_errors)) {
-                        $error = implode(', ', $validation_errors);
-                        break;
+                        $_SESSION['error'] = implode(', ', $validation_errors);
+                        redirect("plans.php");
                     }
                     
                     if ($plan->create()) {
-                        $message = "Plano criado com sucesso!";
+                        $_SESSION['message'] = "Plano criado com sucesso!";
                     } else {
-                        $error = "Erro ao criar plano.";
+                        $_SESSION['error'] = "Erro ao criar plano.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("plans.php");
                     break;
                     
                 case 'edit':
@@ -74,30 +88,37 @@ if ($_POST) {
                     // Validar dados
                     $validation_errors = $plan->validate();
                     if (!empty($validation_errors)) {
-                        $error = implode(', ', $validation_errors);
-                        break;
+                        $_SESSION['error'] = implode(', ', $validation_errors);
+                        redirect("plans.php");
                     }
                     
                     if ($plan->update()) {
-                        $message = "Plano atualizado com sucesso!";
+                        $_SESSION['message'] = "Plano atualizado com sucesso!";
                     } else {
-                        $error = "Erro ao atualizar plano.";
+                        $_SESSION['error'] = "Erro ao atualizar plano.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("plans.php");
                     break;
                     
                 case 'delete':
                     $plan->id = $_POST['id'];
                     
                     if ($plan->delete()) {
-                        $message = "Plano removido com sucesso!";
+                        $_SESSION['message'] = "Plano removido com sucesso!";
                     } else {
-                        $error = "Erro ao remover plano. Verifique se não há usuários usando este plano.";
+                        $_SESSION['error'] = "Erro ao remover plano. Verifique se não há usuários usando este plano.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("plans.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("plans.php");
     }
 }
 

@@ -35,6 +35,17 @@ if (isset($_SESSION['user_role'])) {
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Carregar configurações atuais do usuário
 $user_id = $_SESSION['user_id'];
 $notification_settings = $user->readNotificationSettings($user_id);
@@ -76,7 +87,7 @@ if ($_POST) {
                     
                     // Atualizar configurações
                     if ($user->updateNotificationSettings($user_id, $settings)) {
-                        $message = "Configurações de notificação atualizadas com sucesso!";
+                        $_SESSION['message'] = "Configurações de notificação atualizadas com sucesso!";
                         
                         // Atualizar variáveis da sessão
                         $_SESSION['notify_5_days_before'] = $settings['notify_5_days_before'];
@@ -89,8 +100,11 @@ if ($_POST) {
                         // Atualizar configurações locais para exibição
                         $notification_settings = $settings;
                     } else {
-                        $error = "Erro ao atualizar configurações de notificação.";
+                        $_SESSION['error'] = "Erro ao atualizar configurações de notificação.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("user_settings.php");
                     break;
                     
                 case 'create_missing_templates':
@@ -138,15 +152,19 @@ if ($_POST) {
                     }
                     
                     if ($created_count > 0) {
-                        $message = "Templates criados com sucesso! ($created_count templates)";
+                        $_SESSION['message'] = "Templates criados com sucesso! ($created_count templates)";
                     } else {
-                        $message = "Nenhum template novo foi criado.";
+                        $_SESSION['message'] = "Nenhum template novo foi criado.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("user_settings.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("user_settings.php");
     }
 }
 

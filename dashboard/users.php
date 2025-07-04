@@ -16,6 +16,17 @@ $plan = new Plan($db);
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -31,18 +42,18 @@ if ($_POST) {
                     
                     // Validações
                     if (empty($user->name)) {
-                        $error = "Nome é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Nome é obrigatório.";
+                        redirect("users.php");
                     }
                     
                     if (empty($user->email) || !filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                        $error = "Email válido é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Email válido é obrigatório.";
+                        redirect("users.php");
                     }
                     
                     if (strlen($user->password) < 6) {
-                        $error = "Senha deve ter pelo menos 6 caracteres.";
-                        break;
+                        $_SESSION['error'] = "Senha deve ter pelo menos 6 caracteres.";
+                        redirect("users.php");
                     }
                     
                     // Verificar se email já existe
@@ -52,15 +63,18 @@ if ($_POST) {
                     $check_stmt->execute();
                     
                     if ($check_stmt->rowCount() > 0) {
-                        $error = "Este email já está em uso.";
-                        break;
+                        $_SESSION['error'] = "Este email já está em uso.";
+                        redirect("users.php");
                     }
                     
                     if ($user->create()) {
-                        $message = "Usuário criado com sucesso!";
+                        $_SESSION['message'] = "Usuário criado com sucesso!";
                     } else {
-                        $error = "Erro ao criar usuário.";
+                        $_SESSION['error'] = "Erro ao criar usuário.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
                     
                 case 'edit':
@@ -73,13 +87,13 @@ if ($_POST) {
                     
                     // Validações
                     if (empty($user->name)) {
-                        $error = "Nome é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Nome é obrigatório.";
+                        redirect("users.php");
                     }
                     
                     if (empty($user->email) || !filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                        $error = "Email válido é obrigatório.";
-                        break;
+                        $_SESSION['error'] = "Email válido é obrigatório.";
+                        redirect("users.php");
                     }
                     
                     // Verificar se email já existe (exceto para o próprio usuário)
@@ -90,22 +104,25 @@ if ($_POST) {
                     $check_stmt->execute();
                     
                     if ($check_stmt->rowCount() > 0) {
-                        $error = "Este email já está em uso por outro usuário.";
-                        break;
+                        $_SESSION['error'] = "Este email já está em uso por outro usuário.";
+                        redirect("users.php");
                     }
                     
                     // Proteger usuário admin principal
                     if ($user->id == 1 && $user->role !== 'admin') {
-                        $error = "Não é possível alterar o papel do administrador principal.";
-                        break;
+                        $_SESSION['error'] = "Não é possível alterar o papel do administrador principal.";
+                        redirect("users.php");
                     }
                     
                     // Atualizar usuário
                     if ($user->update()) {
-                        $message = "Usuário atualizado com sucesso!";
+                        $_SESSION['message'] = "Usuário atualizado com sucesso!";
                     } else {
-                        $error = "Erro ao atualizar usuário.";
+                        $_SESSION['error'] = "Erro ao atualizar usuário.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
                     
                 case 'update_subscription':
@@ -122,23 +139,26 @@ if ($_POST) {
                     // Validações específicas para assinatura
                     if ($subscription_data['subscription_status'] === 'trial') {
                         if (empty($subscription_data['trial_starts_at']) || empty($subscription_data['trial_ends_at'])) {
-                            $error = "Para status 'trial', as datas de início e fim do teste são obrigatórias.";
-                            break;
+                            $_SESSION['error'] = "Para status 'trial', as datas de início e fim do teste são obrigatórias.";
+                            redirect("users.php");
                         }
                     }
                     
                     if ($subscription_data['subscription_status'] === 'active') {
                         if (empty($subscription_data['plan_expires_at'])) {
-                            $error = "Para status 'active', a data de expiração do plano é obrigatória.";
-                            break;
+                            $_SESSION['error'] = "Para status 'active', a data de expiração do plano é obrigatória.";
+                            redirect("users.php");
                         }
                     }
                     
                     if ($user->updateSubscriptionDetails($user_id, $subscription_data)) {
-                        $message = "Detalhes da assinatura atualizados com sucesso!";
+                        $_SESSION['message'] = "Detalhes da assinatura atualizados com sucesso!";
                     } else {
-                        $error = "Erro ao atualizar detalhes da assinatura.";
+                        $_SESSION['error'] = "Erro ao atualizar detalhes da assinatura.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
                     
                 case 'renew_plan':
@@ -149,10 +169,13 @@ if ($_POST) {
                     $user_obj->id = $user_id;
                     
                     if ($user_obj->renewPlan($days)) {
-                        $message = "Plano renovado por $days dias com sucesso!";
+                        $_SESSION['message'] = "Plano renovado por $days dias com sucesso!";
                     } else {
-                        $error = "Erro ao renovar plano.";
+                        $_SESSION['error'] = "Erro ao renovar plano.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
                     
                 case 'delete':
@@ -160,14 +183,14 @@ if ($_POST) {
                     
                     // Proteger usuário admin principal
                     if ($user_id == 1) {
-                        $error = "Não é possível deletar o administrador principal.";
-                        break;
+                        $_SESSION['error'] = "Não é possível deletar o administrador principal.";
+                        redirect("users.php");
                     }
                     
                     // Proteger contra auto-exclusão
                     if ($user_id == $_SESSION['user_id']) {
-                        $error = "Você não pode deletar sua própria conta.";
-                        break;
+                        $_SESSION['error'] = "Você não pode deletar sua própria conta.";
+                        redirect("users.php");
                     }
                     
                     $query = "DELETE FROM users WHERE id = :id";
@@ -175,10 +198,13 @@ if ($_POST) {
                     $stmt->bindParam(':id', $user_id);
                     
                     if ($stmt->execute()) {
-                        $message = "Usuário removido com sucesso!";
+                        $_SESSION['message'] = "Usuário removido com sucesso!";
                     } else {
-                        $error = "Erro ao remover usuário.";
+                        $_SESSION['error'] = "Erro ao remover usuário.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
                     
                 case 'reset_password':
@@ -186,8 +212,8 @@ if ($_POST) {
                     $new_password = $_POST['new_password'];
                     
                     if (strlen($new_password) < 6) {
-                        $error = "Nova senha deve ter pelo menos 6 caracteres.";
-                        break;
+                        $_SESSION['error'] = "Nova senha deve ter pelo menos 6 caracteres.";
+                        redirect("users.php");
                     }
                     
                     $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
@@ -198,15 +224,19 @@ if ($_POST) {
                     $stmt->bindParam(':id', $user_id);
                     
                     if ($stmt->execute()) {
-                        $message = "Senha redefinida com sucesso!";
+                        $_SESSION['message'] = "Senha redefinida com sucesso!";
                     } else {
-                        $error = "Erro ao redefinir senha.";
+                        $_SESSION['error'] = "Erro ao redefinir senha.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("users.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("users.php");
     }
 }
 

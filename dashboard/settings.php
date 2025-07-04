@@ -41,6 +41,17 @@ $appSettings = new AppSettings($db);
 $message = '';
 $error = '';
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -85,15 +96,18 @@ if ($_POST) {
                         
                         // Validações específicas
                         if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                            throw new Exception("Email do administrador inválido");
+                            $_SESSION['error'] = "Email do administrador inválido";
+                            redirect("settings.php");
                         }
                         
                         if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
-                            throw new Exception("Delay do WhatsApp deve estar entre 1 e 60 segundos");
+                            $_SESSION['error'] = "Delay do WhatsApp deve estar entre 1 e 60 segundos";
+                            redirect("settings.php");
                         }
                         
                         if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
-                            throw new Exception("Máximo de tentativas deve estar entre 1 e 10");
+                            $_SESSION['error'] = "Máximo de tentativas deve estar entre 1 e 10";
+                            redirect("settings.php");
                         }
                         
                         // Atualizar a configuração
@@ -112,12 +126,14 @@ if ($_POST) {
                         $file_info = getimagesize($favicon_file['tmp_name']);
                         
                         if (!in_array($file_type, $allowed_types) && !$file_info) {
-                            throw new Exception("Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.");
+                            $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
+                            redirect("settings.php");
                         }
                         
                         // Validar tamanho (máximo 1MB)
                         if ($favicon_file['size'] > 1024 * 1024) {
-                            throw new Exception("Arquivo muito grande. Máximo 1MB.");
+                            $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
+                            redirect("settings.php");
                         }
                         
                         // Criar diretório de uploads se não existir
@@ -146,32 +162,37 @@ if ($_POST) {
                             // Salvar novo caminho no banco
                             if ($appSettings->set('favicon_path', $web_path, 'Caminho para o favicon do site', 'string')) {
                                 $updated++;
-                                $message .= " Favicon atualizado com sucesso!";
+                                $favicon_message = " Favicon atualizado com sucesso!";
                             }
                         } else {
-                            throw new Exception("Erro ao fazer upload do favicon.");
+                            $_SESSION['error'] = "Erro ao fazer upload do favicon.";
+                            redirect("settings.php");
                         }
                     }
                     
                     if ($updated > 0) {
-                        if (empty($message)) {
-                            $message = "Configurações atualizadas com sucesso! ($updated alterações)";
-                        } else {
-                            $message = "Configurações atualizadas com sucesso! ($updated alterações)" . $message;
+                        $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
+                        if (isset($favicon_message)) {
+                            $success_message .= $favicon_message;
                         }
+                        $_SESSION['message'] = $success_message;
                         
                         // Atualizar timezone se foi alterado
                         if (isset($_POST['timezone'])) {
                             date_default_timezone_set($_POST['timezone']);
                         }
-                    } else {
-                        $error = "Nenhuma configuração foi alterada.";
-                    }
+                        } else {
+                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
+                        }
+                        
+                    // Redirecionar para evitar reenvio
+                    redirect("settings.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("settings.php");
     }
 }
 

@@ -263,16 +263,45 @@ class WhatsAppAPI {
         return $this->makeRequest('/instance/fetchInstances');
     }
     
-    // Método para verificar se uma instância já existe
+    // Método melhorado para verificar se uma instância existe
     public function instanceExists($instanceName) {
-        $result = $this->listInstances();
-        if ($result['status_code'] === 200 && isset($result['data'])) {
-            foreach ($result['data'] as $instance) {
-                if (isset($instance['instance']['instanceName']) && $instance['instance']['instanceName'] === $instanceName) {
+        error_log("=== CHECKING INSTANCE EXISTENCE ===");
+        error_log("Instance name: " . $instanceName);
+        
+        // Primeiro, tentar obter o status da instância diretamente
+        $status_result = $this->getInstanceStatus($instanceName);
+        
+        if ($status_result['status_code'] === 200) {
+            error_log("Instance exists - status check returned 200");
+            return true;
+        }
+        
+        // Se o status falhou, tentar listar todas as instâncias
+        $list_result = $this->listInstances();
+        
+        if ($list_result['status_code'] === 200 && isset($list_result['data'])) {
+            error_log("Checking instance list...");
+            
+            foreach ($list_result['data'] as $instance) {
+                $instance_name_in_list = null;
+                
+                // Diferentes estruturas possíveis da resposta
+                if (isset($instance['instance']['instanceName'])) {
+                    $instance_name_in_list = $instance['instance']['instanceName'];
+                } elseif (isset($instance['instanceName'])) {
+                    $instance_name_in_list = $instance['instanceName'];
+                } elseif (isset($instance['name'])) {
+                    $instance_name_in_list = $instance['name'];
+                }
+                
+                if ($instance_name_in_list === $instanceName) {
+                    error_log("Instance found in list: " . $instance_name_in_list);
                     return true;
                 }
             }
         }
+        
+        error_log("Instance does not exist");
         return false;
     }
     
@@ -318,6 +347,22 @@ class WhatsAppAPI {
         return $this->makeRequest("/chat/whatsappNumbers/{$instanceName}", 'POST', [
             'numbers' => [$cleanPhone]
         ]);
+    }
+    
+    // Método para forçar a criação de uma nova instância (deletar se existir e criar nova)
+    public function forceCreateInstance($instanceName) {
+        error_log("=== FORCE CREATE INSTANCE ===");
+        error_log("Instance name: " . $instanceName);
+        
+        // Primeiro, tentar deletar a instância se ela existir
+        $delete_result = $this->deleteInstance($instanceName);
+        error_log("Delete attempt result: " . $delete_result['status_code']);
+        
+        // Aguardar um momento para a API processar a exclusão
+        sleep(3);
+        
+        // Agora criar a nova instância
+        return $this->createInstance($instanceName);
     }
 }
 ?>

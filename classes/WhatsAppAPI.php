@@ -90,9 +90,10 @@ class WhatsAppAPI {
         error_log("=== CREATE INSTANCE DEBUG ===");
         error_log("Instance name: " . $instanceName);
         
-        // Payload correto para Evolution API V2
+        // Payload correto para Evolution API V2 com token incluído
         $data = [
             'instanceName' => $instanceName,
+            'token' => $this->api_key,
             'integration' => 'WHATSAPP-BAILEYS',
             'qrcode' => true
         ];

@@ -8,6 +8,13 @@ if (!isset($_SESSION['user_id'])) {
     redirect("../login.php");
 }
 
+// Verificar se é administrador (apenas admin@clientmanager.com pode acessar)
+if ($_SESSION['user_email'] !== 'admin@clientmanager.com') {
+    // Redirecionar para dashboard com mensagem de erro
+    $_SESSION['error_message'] = 'Acesso negado. Apenas administradores podem acessar as configurações do sistema.';
+    redirect("index.php");
+}
+
 $database = new Database();
 $db = $database->getConnection();
 $appSettings = new AppSettings($db);
@@ -177,6 +184,7 @@ $timezones = [
                         <a href="settings.php" class="bg-blue-600 text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-cog mr-3"></i>
                             Configurações
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
                         </a>
                     </nav>
                 </div>
@@ -185,7 +193,8 @@ $timezones = [
                         <div class="flex items-center">
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-200"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white">Sair</a>
+                                <span class="text-xs font-medium text-yellow-400">Administrador</span>
+                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
                             </div>
                         </div>
                     </div>
@@ -198,7 +207,13 @@ $timezones = [
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-3xl font-bold text-gray-900">Configurações do Sistema</h1>
+                        <div class="flex items-center justify-between">
+                            <h1 class="text-3xl font-bold text-gray-900">Configurações do Sistema</h1>
+                            <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-shield-alt mr-1"></i>
+                                Acesso Administrativo
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -220,6 +235,21 @@ $timezones = [
                                 </div>
                             </div>
                         <?php endif; ?>
+
+                        <!-- Alerta de Segurança -->
+                        <div class="mt-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-yellow-800">
+                                        <strong>Área Restrita:</strong> Esta página contém configurações críticas do sistema. 
+                                        Apenas administradores autorizados devem fazer alterações aqui.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Formulário de Configurações -->
                         <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
@@ -364,6 +394,16 @@ $timezones = [
                                     <div>
                                         <strong>Versão do PHP:</strong><br>
                                         <span class="text-gray-600"><?php echo phpversion(); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Usuário Logado:</strong><br>
+                                        <span class="text-gray-600"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Nível de Acesso:</strong><br>
+                                        <span class="text-red-600 font-medium">Administrador</span>
                                     </div>
                                 </div>
                             </div>

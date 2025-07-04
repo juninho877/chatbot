@@ -34,6 +34,9 @@ $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $messages_today = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+// Verificar se é administrador (email admin@clientmanager.com)
+$is_admin = ($_SESSION['user_email'] === 'admin@clientmanager.com');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -78,6 +81,12 @@ $messages_today = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                             <i class="fas fa-chart-bar mr-3"></i>
                             Relatórios
                         </a>
+                        <?php if ($is_admin): ?>
+                        <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            <i class="fas fa-cog mr-3"></i>
+                            Configurações
+                        </a>
+                        <?php endif; ?>
                     </nav>
                 </div>
                 <div class="flex-shrink-0 flex border-t border-gray-700 p-4">
@@ -85,7 +94,10 @@ $messages_today = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                         <div class="flex items-center">
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-200"><?php echo $_SESSION['user_name']; ?></p>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white">Sair</a>
+                                <?php if ($is_admin): ?>
+                                    <span class="text-xs font-medium text-yellow-400">Administrador</span>
+                                <?php endif; ?>
+                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
                             </div>
                         </div>
                     </div>

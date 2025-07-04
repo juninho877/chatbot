@@ -178,18 +178,10 @@ class WhatsAppAPI {
         $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
         error_log("Cleaned phone: " . $cleanPhone);
         
-        // Verificar se o número já tem código do país
-        if (strlen($cleanPhone) === 11 && (str_starts_with($cleanPhone, '11') || str_starts_with($cleanPhone, '21') || str_starts_with($cleanPhone, '31'))) {
-            // Número brasileiro sem código do país - adicionar 55
-            $finalPhone = '55' . $cleanPhone;
-        } elseif (strlen($cleanPhone) === 13 && str_starts_with($cleanPhone, '55')) {
-            // Já tem código do país
-            $finalPhone = $cleanPhone;
-        } elseif (strlen($cleanPhone) === 10 || strlen($cleanPhone) === 11) {
-            // Número brasileiro - adicionar código do país
+        // LÓGICA SIMPLIFICADA: Se não começar com 55, adicionar 55
+        if (!str_starts_with($cleanPhone, '55')) {
             $finalPhone = '55' . $cleanPhone;
         } else {
-            // Usar como está
             $finalPhone = $cleanPhone;
         }
         
@@ -316,6 +308,7 @@ class WhatsAppAPI {
     
     // Método para obter informações do contato
     public function getContactInfo($instanceName, $phone) {
+        // Aplicar a mesma lógica simplificada de formatação
         $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
         
         if (!str_starts_with($cleanPhone, '55')) {

@@ -52,6 +52,17 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']); // Limpar da sessão após usar
 }
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -98,15 +109,18 @@ if ($_POST) {
                         if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
                             $_SESSION['error'] = "Email do administrador inválido";
                             redirect("settings.php");
+                            redirect("settings.php");
                         }
                         
                         if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
                             $_SESSION['error'] = "Delay do WhatsApp deve estar entre 1 e 60 segundos";
                             redirect("settings.php");
+                            redirect("settings.php");
                         }
                         
                         if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
                             $_SESSION['error'] = "Máximo de tentativas deve estar entre 1 e 10";
+                            redirect("settings.php");
                             redirect("settings.php");
                         }
                         
@@ -128,11 +142,13 @@ if ($_POST) {
                         if (!in_array($file_type, $allowed_types) && !$file_info) {
                             $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
                             redirect("settings.php");
+                            redirect("settings.php");
                         }
                         
                         // Validar tamanho (máximo 1MB)
                         if ($favicon_file['size'] > 1024 * 1024) {
                             $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
+                            redirect("settings.php");
                             redirect("settings.php");
                         }
                         
@@ -167,6 +183,7 @@ if ($_POST) {
                         } else {
                             $_SESSION['error'] = "Erro ao fazer upload do favicon.";
                             redirect("settings.php");
+                            redirect("settings.php");
                         }
                     }
                     
@@ -174,7 +191,6 @@ if ($_POST) {
                         $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
                         if (isset($favicon_message)) {
                             $success_message .= $favicon_message;
-                        }
                         $_SESSION['message'] = $success_message;
                         
                         // Atualizar timezone se foi alterado
@@ -187,11 +203,16 @@ if ($_POST) {
                         
                     // Redirecionar para evitar reenvio
                     redirect("settings.php");
+                        $_SESSION['message'] = $success_message;
+                        
+                    // Redirecionar para evitar reenvio
+                    redirect("settings.php");
                     break;
             }
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("settings.php");
         redirect("settings.php");
     }
 }
@@ -222,6 +243,7 @@ $timezones = [
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
@@ -519,59 +541,8 @@ $timezones = [
                                     </div>
                                     
                                     <div>
-                                        <strong>Cobrança Automática:</strong><br>
                                         <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
-                                            <?php echo $appSettings->isAutoBillingEnabled() ? 'Ativa' : 'Inativa'; ?>
-                                        </span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Períodos Ativos:</strong><br>
-                                        <span class="text-gray-600">
-                                            <?php 
-                                            $active_periods = [];
-                                            if ($appSettings->isNotify5DaysBeforeEnabled()) $active_periods[] = '5 dias antes';
-                                            if ($appSettings->isNotify3DaysBeforeEnabled()) $active_periods[] = '3 dias antes';
-                                            if ($appSettings->isNotify2DaysBeforeEnabled()) $active_periods[] = '2 dias antes';
-                                            if ($appSettings->isNotify1DayBeforeEnabled()) $active_periods[] = '1 dia antes';
-                                            if ($appSettings->isNotifyOnDueDateEnabled()) $active_periods[] = 'No vencimento';
-                                            if ($appSettings->isNotify1DayAfterDueEnabled()) $active_periods[] = '1 dia após';
-                                            
-                                            echo !empty($active_periods) ? implode(', ', $active_periods) : 'Nenhum período ativo';
-                                            ?>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Instruções de Automação -->
-                        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-                            <h4 class="text-lg font-medium text-blue-900 mb-3">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                Sobre os Períodos de Notificação
-                            </h4>
-                            <div class="text-sm text-blue-800 space-y-2">
-                                <p>
-                                    <strong>Como funciona:</strong> O sistema verificará diariamente (via cron job) quais clientes se enquadram nos períodos configurados e enviará as mensagens automaticamente.
-                                </p>
-                                <ul class="list-disc list-inside ml-4 space-y-1">
-                                    <li><strong>5 dias antes:</strong> Aviso antecipado para o cliente se organizar</li>
-                                    <li><strong>3 dias antes:</strong> Lembrete padrão (recomendado)</li>
-                                    <li><strong>2 dias antes:</strong> Lembrete mais próximo do vencimento</li>
-                                    <li><strong>1 dia antes:</strong> Último aviso antes do vencimento</li>
-                                    <li><strong>No vencimento:</strong> Lembrete no dia que vence</li>
-                                    <li><strong>1 dia após:</strong> Cobrança para pagamentos em atraso</li>
-                                </ul>
-                                <p class="mt-3">
-                                    <strong>Importante:</strong> Para cada período ativo, você deve criar templates específicos na seção "Templates de Mensagem" com os tipos correspondentes.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+        <?php include 'sidebar.php'; ?>
     </div>
 
     <script>

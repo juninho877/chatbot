@@ -141,4 +141,3 @@ class Plan {
         return $result['count'] ?? 0;
     }
 }
-?>

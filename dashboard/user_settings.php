@@ -46,6 +46,17 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']); // Limpar da sessão após usar
 }
 
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
+
 // Carregar configurações atuais do usuário
 $user_id = $_SESSION['user_id'];
 $notification_settings = $user->readNotificationSettings($user_id);
@@ -105,6 +116,9 @@ if ($_POST) {
                     
                     // Redirecionar para evitar reenvio
                     redirect("user_settings.php");
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("user_settings.php");
                     break;
                     
                 case 'create_missing_templates':
@@ -159,11 +173,15 @@ if ($_POST) {
                     
                     // Redirecionar para evitar reenvio
                     redirect("user_settings.php");
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("user_settings.php");
                     break;
             }
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("user_settings.php");
         redirect("user_settings.php");
     }
 }
@@ -180,6 +198,7 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
@@ -390,69 +409,8 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                             <?php endif; ?>
                                         </div>
                                         
-                                        <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
                                             <i class="fas fa-save mr-2"></i>
-                                            Salvar Configurações
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Dicas e Recomendações -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
-                            <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Dicas e Recomendações</h3>
-                                
-                                <div class="space-y-4">
-                                    <div class="bg-blue-50 p-4 rounded-lg">
-                                        <h4 class="font-medium text-blue-800 mb-2">
-                                            <i class="fas fa-lightbulb text-blue-500 mr-2"></i>
-                                            Melhores Práticas para Notificações
-                                        </h4>
-                                        <ul class="list-disc list-inside text-sm text-blue-700 space-y-1">
-                                            <li>Ative apenas 2-3 períodos para não sobrecarregar seus clientes com mensagens</li>
-                                            <li>Recomendamos ativar "3 dias antes" e "no dia do vencimento"</li>
-                                            <li>Personalize os templates com uma linguagem amigável</li>
-                                            <li>Inclua instruções claras de pagamento nos templates</li>
-                                            <li>Verifique regularmente o relatório de mensagens enviadas</li>
-                                        </ul>
-                                    </div>
-                                    
-                                    <div class="bg-green-50 p-4 rounded-lg">
-                                        <h4 class="font-medium text-green-800 mb-2">
-                                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                            Benefícios da Automação
-                                        </h4>
-                                        <ul class="list-disc list-inside text-sm text-green-700 space-y-1">
-                                            <li>Redução de inadimplência em até 40%</li>
-                                            <li>Economia de tempo com cobranças manuais</li>
-                                            <li>Padronização da comunicação com clientes</li>
-                                            <li>Melhor experiência para seus clientes</li>
-                                            <li>Acompanhamento automático de pagamentos</li>
-                                        </ul>
-                                    </div>
-                                    
-                                    <div class="bg-purple-50 p-4 rounded-lg">
-                                        <h4 class="font-medium text-purple-800 mb-2">
-                                            <i class="fas fa-magic text-purple-500 mr-2"></i>
-                                            Próximos Passos
-                                        </h4>
-                                        <ol class="list-decimal list-inside text-sm text-purple-700 space-y-1">
-                                            <li>Selecione os períodos de notificação desejados acima</li>
-                                            <li>Verifique se você tem templates para cada período selecionado</li>
-                                            <li>Personalize os templates na seção <a href="templates.php" class="underline">Templates</a></li>
-                                            <li>Certifique-se de que seu <a href="whatsapp.php" class="underline">WhatsApp está conectado</a></li>
-                                            <li>Pronto! O sistema enviará mensagens automaticamente nos períodos configurados</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+        <?php include 'sidebar.php'; ?>
     </div>
 
     <script>

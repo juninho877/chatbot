@@ -277,6 +277,22 @@ function cleanWhatsAppMessageId($message_id) {
 }
 
 /**
+ * Função para limpar ID da mensagem do WhatsApp removendo sufixos
+ */
+function cleanWhatsAppMessageId($message_id) {
+    if (empty($message_id)) {
+        return null;
+    }
+    
+    // Remover sufixos como _0, _1, etc.
+    $cleaned_id = preg_replace('/_\d+$/', '', $message_id);
+    
+    error_log("Cleaned WhatsApp message ID: '$message_id' -> '$cleaned_id'");
+    
+    return $cleaned_id;
+}
+
+/**
  * Função para enviar mensagem automática
  */
 function sendAutomaticMessage($whatsapp, $template, $messageHistory, $user_id, $client_data, $instance_name, $template_type, $template_name) {
@@ -327,6 +343,8 @@ function sendAutomaticMessage($whatsapp, $template, $messageHistory, $user_id, $
         $whatsapp_message_id = null;
         if (isset($result['data']['key']['id'])) {
             $raw_id = $result['data']['key']['id'];
+            $whatsapp_message_id = cleanWhatsAppMessageId($raw_id);
+            error_log("Raw WhatsApp message ID: '$raw_id', Cleaned: '$whatsapp_message_id'");
             $whatsapp_message_id = cleanWhatsAppMessageId($raw_id);
             error_log("Raw WhatsApp message ID: '$raw_id', Cleaned: '$whatsapp_message_id'");
         }

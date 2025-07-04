@@ -90,7 +90,7 @@ class WhatsAppAPI {
         error_log("=== CREATE INSTANCE DEBUG ===");
         error_log("Instance name: " . $instanceName);
         
-        // Payload correto para Evolution API V2 com token incluído
+        // Payload simplificado sem webhook - será configurado separadamente
         $data = [
             'instanceName' => $instanceName,
             'token' => $this->api_key,
@@ -98,14 +98,7 @@ class WhatsAppAPI {
             'qrcode' => true
         ];
         
-        // Adicionar webhook apenas se SITE_URL estiver definido e não for localhost
-        if (defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
-            $webhook_url = SITE_URL . '/webhook/whatsapp.php';
-            $data['webhook'] = $webhook_url;
-            error_log("Adding webhook: " . $webhook_url);
-        }
-        
-        error_log("Final payload: " . json_encode($data, JSON_PRETTY_PRINT));
+        error_log("Create instance payload: " . json_encode($data, JSON_PRETTY_PRINT));
         
         $result = $this->makeRequest('/instance/create', 'POST', $data);
         
@@ -347,7 +340,18 @@ class WhatsAppAPI {
         sleep(3);
         
         // Agora criar a nova instância
-        return $this->createInstance($instanceName);
+        $create_result = $this->createInstance($instanceName);
+        
+        // Se a criação foi bem-sucedida, configurar o webhook
+        if (($create_result['status_code'] === 200 || $create_result['status_code'] === 201) && 
+            defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
+            
+            error_log("Setting up webhook after instance creation");
+            $webhook_url = SITE_URL . '/webhook/whatsapp.php';
+            $this->setWebhook($instanceName, $webhook_url);
+        }
+        
+        return $create_result;
     }
     
     // Método para configurar webhook em uma instância existente

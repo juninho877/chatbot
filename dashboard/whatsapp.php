@@ -85,11 +85,24 @@ if ($_POST) {
                             $user->updateWhatsAppConnectedStatus(true);
                             $_SESSION['whatsapp_instance'] = $instance_name;
                             $_SESSION['whatsapp_connected'] = true;
+                            
+                            // Configurar webhook se necessário
+                            if (defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
+                                $webhook_url = SITE_URL . '/webhook/whatsapp.php';
+                                $whatsapp->setWebhook($instance_name, $webhook_url);
+                            }
                             break;
                         }
 
                         // CENÁRIO B: Instância existe mas não está conectada - tentar obter QR
                         error_log("Step 3: Attempting to get QR code from existing instance");
+                        
+                        // Configurar webhook antes de obter QR
+                        if (defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
+                            $webhook_url = SITE_URL . '/webhook/whatsapp.php';
+                            $whatsapp->setWebhook($instance_name, $webhook_url);
+                        }
+                        
                         $qr_result = $whatsapp->getQRCode($instance_name);
 
                         if ($qr_result['status_code'] == 200 && isset($qr_result['data']['base64'])) {
@@ -147,7 +160,14 @@ if ($_POST) {
                         $create_result = $whatsapp->createInstance($instance_name);
                         
                         if ($create_result['status_code'] == 201 || $create_result['status_code'] == 200) {
-                            error_log("Step 3: Instance created successfully, getting QR code");
+                            error_log("Step 3: Instance created successfully, setting up webhook and getting QR code");
+                            
+                            // Configurar webhook após criação da instância
+                            if (defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
+                                $webhook_url = SITE_URL . '/webhook/whatsapp.php';
+                                $whatsapp->setWebhook($instance_name, $webhook_url);
+                            }
+                            
                             sleep(2);
                             
                             $qr_result = $whatsapp->getQRCode($instance_name);
@@ -238,6 +258,12 @@ if ($_POST) {
                     error_log("=== REFRESH QR CODE ACTION ===");
                     
                     if ($instance_name) {
+                        // Configurar webhook antes de obter QR
+                        if (defined('SITE_URL') && SITE_URL && !str_contains(SITE_URL, 'localhost')) {
+                            $webhook_url = SITE_URL . '/webhook/whatsapp.php';
+                            $whatsapp->setWebhook($instance_name, $webhook_url);
+                        }
+                        
                         $result = $whatsapp->getQRCode($instance_name);
                         
                         if ($result['status_code'] == 200 && isset($result['data']['base64'])) {

@@ -336,6 +336,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                             
                                             <div class="mb-3">
                                                 <?php
+                                                // Mapeamento completo e atualizado dos tipos
                                                 $type_labels = [
                                                     'cobranca' => 'Cobrança',
                                                     'lembrete' => 'Lembrete',
@@ -348,9 +349,24 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                     'due_today' => 'Vencimento hoje',
                                                     'overdue_1_day' => '1 dia em atraso'
                                                 ];
+                                                
+                                                // Obter o label correto ou usar o tipo como fallback
+                                                $type_label = $type_labels[$template_row['type']] ?? ucfirst(str_replace('_', ' ', $template_row['type']));
+                                                
+                                                // Definir cor baseada no tipo
+                                                $type_color = 'bg-blue-100 text-blue-800';
+                                                if (strpos($template_row['type'], 'due_') === 0) {
+                                                    $type_color = 'bg-yellow-100 text-yellow-800';
+                                                } elseif ($template_row['type'] === 'overdue_1_day') {
+                                                    $type_color = 'bg-red-100 text-red-800';
+                                                } elseif ($template_row['type'] === 'boas_vindas') {
+                                                    $type_color = 'bg-green-100 text-green-800';
+                                                } elseif ($template_row['type'] === 'cobranca') {
+                                                    $type_color = 'bg-orange-100 text-orange-800';
+                                                }
                                                 ?>
-                                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
-                                                    <?php echo $type_labels[$template_row['type']] ?? 'Personalizado'; ?>
+                                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded <?php echo $type_color; ?>">
+                                                    <?php echo htmlspecialchars($type_label); ?>
                                                 </span>
                                             </div>
                                             

@@ -241,48 +241,48 @@ if ($qr_code) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100">
     <!-- Sidebar -->
-    <div class="flex h-screen bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
         <div class="hidden md:flex md:w-64 md:flex-col">
-            <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+            <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-gray-800 text-gray-100 border-r border-gray-700">
                 <div class="flex items-center flex-shrink-0 px-4">
-                    <h1 class="text-xl font-bold text-blue-600">ClientManager Pro</h1>
+                    <h1 class="text-2xl font-extrabold text-white">ClientManager Pro</h1>
                 </div>
                 <div class="mt-5 flex-grow flex flex-col">
                     <nav class="flex-1 px-2 space-y-1">
-                        <a href="index.php" class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="index.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-home mr-3"></i>
                             Dashboard
                         </a>
-                        <a href="clients.php" class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="clients.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-users mr-3"></i>
                             Clientes
                         </a>
-                        <a href="messages.php" class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="messages.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fab fa-whatsapp mr-3"></i>
                             Mensagens
                         </a>
-                        <a href="templates.php" class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="templates.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-template mr-3"></i>
                             Templates
                         </a>
-                        <a href="whatsapp.php" class="bg-blue-100 text-blue-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="whatsapp.php" class="bg-blue-600 text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-qrcode mr-3"></i>
                             WhatsApp
                         </a>
-                        <a href="reports.php" class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <a href="reports.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-chart-bar mr-3"></i>
                             Relatórios
                         </a>
                     </nav>
                 </div>
-                <div class="flex-shrink-0 flex border-t border-gray-200 p-4">
+                <div class="flex-shrink-0 flex border-t border-gray-700 p-4">
                     <div class="flex-shrink-0 w-full group block">
                         <div class="flex items-center">
                             <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-500 hover:text-gray-700">Sair</a>
+                                <p class="text-sm font-medium text-gray-200"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
+                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white">Sair</a>
                             </div>
                         </div>
                     </div>
@@ -295,40 +295,40 @@ if ($qr_code) {
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-2xl font-semibold text-gray-900">Configuração do WhatsApp</h1>
+                        <h1 class="text-3xl font-bold text-gray-900">Configuração do WhatsApp</h1>
                     </div>
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         
                         <!-- Mensagens de feedback -->
                         <?php if ($message): ?>
-                            <div class="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                            <div class="mt-4 bg-green-100 border-green-400 text-green-800 p-4 rounded-lg shadow-sm">
                                 <div class="flex">
-                                    <i class="fas fa-check-circle mr-2 mt-0.5"></i>
+                                    <i class="fas fa-check-circle mr-3 mt-0.5"></i>
                                     <span><?php echo htmlspecialchars($message); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
                         
                         <?php if ($error): ?>
-                            <div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                            <div class="mt-4 bg-red-100 border-red-400 text-red-800 p-4 rounded-lg shadow-sm">
                                 <div class="flex">
-                                    <i class="fas fa-exclamation-circle mr-2 mt-0.5"></i>
+                                    <i class="fas fa-exclamation-circle mr-3 mt-0.5"></i>
                                     <span><?php echo htmlspecialchars($error); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
 
                         <!-- Teste de Conectividade -->
-                        <div class="mt-8 bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">Diagnóstico da API</h3>
-                                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">Diagnóstico da API</h3>
+                                <div class="mt-2 max-w-xl text-base text-gray-600">
                                     <p>Execute os testes abaixo para diagnosticar problemas com a API Evolution</p>
                                 </div>
                                 <div class="mt-5 flex flex-wrap gap-3">
                                     <form method="POST" class="inline">
                                         <input type="hidden" name="action" value="test_connection">
-                                        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-150">
+                                        <button type="submit" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition duration-150 shadow-sm hover:shadow-md">
                                             <i class="fas fa-wifi mr-2"></i>
                                             Testar Conexão
                                         </button>
@@ -336,7 +336,7 @@ if ($qr_code) {
                                     
                                     <form method="POST" class="inline">
                                         <input type="hidden" name="action" value="list_instances">
-                                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-150">
+                                        <button type="submit" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition duration-150 shadow-sm hover:shadow-md">
                                             <i class="fas fa-list mr-2"></i>
                                             Listar Instâncias
                                         </button>
@@ -345,7 +345,7 @@ if ($qr_code) {
                                     <?php if ($_SESSION['whatsapp_instance']): ?>
                                     <form method="POST" class="inline">
                                         <input type="hidden" name="action" value="get_instance_info">
-                                        <button type="submit" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition duration-150">
+                                        <button type="submit" class="bg-orange-600 text-white px-5 py-2.5 rounded-lg hover:bg-orange-700 transition duration-150 shadow-sm hover:shadow-md">
                                             <i class="fas fa-info-circle mr-2"></i>
                                             Info da Instância
                                         </button>
@@ -356,10 +356,10 @@ if ($qr_code) {
                         </div>
 
                         <!-- Status da Conexão -->
-                        <div class="mt-8 bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">Status da Conexão</h3>
-                                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">Status da Conexão</h3>
+                                <div class="mt-2 max-w-xl text-base text-gray-600">
                                     <p>Status atual da sua conexão com o WhatsApp</p>
                                 </div>
                                 <div class="mt-5">
@@ -375,15 +375,15 @@ if ($qr_code) {
                                                 }
                                                 ?>
                                                 <?php if ($connection_state == 'open'): ?>
-                                                    <i class="fas fa-check-circle text-green-400 text-2xl"></i>
+                                                    <i class="fas fa-check-circle text-green-400 text-3xl"></i>
                                                 <?php elseif ($connection_state == 'connecting'): ?>
-                                                    <i class="fas fa-spinner fa-spin text-yellow-400 text-2xl"></i>
+                                                    <i class="fas fa-spinner fa-spin text-yellow-400 text-3xl"></i>
                                                 <?php else: ?>
-                                                    <i class="fas fa-times-circle text-red-400 text-2xl"></i>
+                                                    <i class="fas fa-times-circle text-red-400 text-3xl"></i>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-900">
+                                                <p class="text-base font-medium text-gray-900">
                                                     Status: <?php echo htmlspecialchars(ucfirst($connection_state)); ?>
                                                 </p>
                                                 <p class="text-sm text-gray-500">
@@ -405,10 +405,10 @@ if ($qr_code) {
                                     <?php else: ?>
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
-                                                <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                                                <i class="fas fa-exclamation-triangle text-yellow-400 text-3xl"></i>
                                             </div>
                                             <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-900">
+                                                <p class="text-base font-medium text-gray-900">
                                                     WhatsApp não configurado
                                                 </p>
                                                 <p class="text-sm text-gray-500">
@@ -422,18 +422,18 @@ if ($qr_code) {
                         </div>
 
                         <!-- Configuração -->
-                        <div class="mt-8 bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">Conectar WhatsApp</h3>
-                                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">Conectar WhatsApp</h3>
+                                <div class="mt-2 max-w-xl text-base text-gray-600">
                                     <p>Siga os passos abaixo para conectar seu WhatsApp à plataforma</p>
                                 </div>
 
                                 <div class="mt-6 space-y-6">
                                     <!-- Passo 1: Criar Instância -->
                                     <div class="border rounded-lg p-4">
-                                        <h4 class="font-medium text-gray-900 mb-2">
-                                            <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mr-2">1</span>
+                                        <h4 class="font-semibold text-gray-900 mb-2">
+                                            <span class="inline-flex items-center justify-center w-7 h-7 bg-blue-600 text-white rounded-full text-sm font-medium mr-2">1</span>
                                             Criar Instância
                                         </h4>
                                         <p class="text-sm text-gray-600 mb-4">
@@ -442,7 +442,7 @@ if ($qr_code) {
                                         </p>
                                         <form method="POST" class="inline">
                                             <input type="hidden" name="action" value="create_instance">
-                                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-150">
+                                            <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-sm hover:shadow-md">
                                                 <i class="fas fa-plus mr-2"></i>
                                                 Criar Instância
                                             </button>
@@ -452,8 +452,8 @@ if ($qr_code) {
                                     <!-- Passo 2: Obter QR Code -->
                                     <?php if ($_SESSION['whatsapp_instance']): ?>
                                     <div class="border rounded-lg p-4">
-                                        <h4 class="font-medium text-gray-900 mb-2">
-                                            <span class="inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full text-sm font-medium mr-2">2</span>
+                                        <h4 class="font-semibold text-gray-900 mb-2">
+                                            <span class="inline-flex items-center justify-center w-7 h-7 bg-blue-600 text-white rounded-full text-sm font-medium mr-2">2</span>
                                             Escanear QR Code
                                         </h4>
                                         <p class="text-sm text-gray-600 mb-4">
@@ -461,7 +461,7 @@ if ($qr_code) {
                                         </p>
                                         <form method="POST" class="inline">
                                             <input type="hidden" name="action" value="get_qr">
-                                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150">
+                                            <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-sm hover:shadow-md">
                                                 <i class="fab fa-whatsapp mr-2"></i>
                                                 Gerar QR Code
                                             </button>
@@ -469,12 +469,12 @@ if ($qr_code) {
 
                                         <?php if ($qr_code): ?>
                                         <div class="mt-4">
-                                            <div class="bg-gray-50 p-4 rounded-lg text-center">
+                                            <div class="bg-gray-100 p-4 rounded-lg text-center">
                                                 <div class="qr-code-container">
                                                     <img id="qr-image" 
                                                          src="data:image/png;base64,<?php echo $qr_code; ?>" 
                                                          alt="QR Code WhatsApp" 
-                                                         class="mx-auto max-w-xs border rounded-lg shadow-sm"
+                                                         class="mx-auto max-w-xs border-2 border-gray-200 p-2 rounded-lg shadow-sm"
                                                          style="max-width: 300px; height: auto;"
                                                          onload="console.log('QR Code image loaded successfully')"
                                                          onerror="handleQRError(this)">
@@ -518,7 +518,7 @@ if ($qr_code) {
 
                                     <!-- Instruções -->
                                     <div class="border rounded-lg p-4 bg-blue-50">
-                                        <h4 class="font-medium text-gray-900 mb-2">
+                                        <h4 class="font-semibold text-gray-900 mb-2">
                                             <i class="fas fa-info-circle text-blue-500 mr-2"></i>
                                             Como escanear o QR Code:
                                         </h4>
@@ -544,13 +544,13 @@ if ($qr_code) {
                         }
                         ?>
                         <?php if ($connection_state == 'open'): ?>
-                        <div class="mt-8 bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">
                                     <i class="fas fa-phone text-blue-500 mr-2"></i>
                                     Validar Número
                                 </h3>
-                                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                                <div class="mt-2 max-w-xl text-base text-gray-600">
                                     <p>Verifique se um número de telefone está registrado no WhatsApp</p>
                                 </div>
                                 <form method="POST" class="mt-5">
@@ -562,10 +562,10 @@ if ($qr_code) {
                                             </label>
                                             <input type="tel" name="phone_to_validate" id="phone_to_validate" 
                                                    placeholder="5511999999999"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
                                         </div>
                                         <div class="flex items-end">
-                                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-150">
+                                            <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-sm hover:shadow-md">
                                                 <i class="fas fa-search mr-2"></i>
                                                 Validar
                                             </button>
@@ -576,18 +576,18 @@ if ($qr_code) {
                         </div>
 
                         <!-- Teste de Mensagem -->
-                        <div class="mt-8 bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">
                                     <i class="fas fa-paper-plane text-green-500 mr-2"></i>
                                     Teste de Mensagem
                                 </h3>
-                                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                                <div class="mt-2 max-w-xl text-base text-gray-600">
                                     <p>Envie uma mensagem de teste para verificar se tudo está funcionando</p>
                                 </div>
                                 
                                 <!-- Dicas importantes -->
-                                <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="mt-4 bg-yellow-100 border-yellow-400 rounded-lg p-4 shadow-sm">
                                     <h4 class="text-sm font-medium text-yellow-800 mb-2">
                                         <i class="fas fa-lightbulb mr-2"></i>
                                         Dicas importantes:
@@ -609,7 +609,7 @@ if ($qr_code) {
                                             </label>
                                             <input type="tel" name="test_phone" id="test_phone" 
                                                    placeholder="5511999999999"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
                                             <p class="mt-1 text-xs text-gray-500">Exemplo: 5511999999999 (Brasil + SP + número)</p>
                                         </div>
                                         <div>
@@ -618,11 +618,11 @@ if ($qr_code) {
                                             </label>
                                             <input type="text" name="test_message" id="test_message" 
                                                    value="Teste de conexão do ClientManager Pro!"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
                                         </div>
                                     </div>
                                     <div class="mt-4">
-                                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150">
+                                        <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-sm hover:shadow-md">
                                             <i class="fab fa-whatsapp mr-2"></i>
                                             Enviar Teste
                                         </button>
@@ -633,9 +633,9 @@ if ($qr_code) {
                         <?php endif; ?>
 
                         <!-- Debug Info -->
-                        <div class="mt-8 bg-gray-100 shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">Informações de Debug</h3>
+                        <div class="mt-8 bg-gray-50 shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900">Informações de Debug</h3>
                                 <div class="mt-2 text-sm text-gray-600">
                                     <p><strong>API URL:</strong> <?php echo EVOLUTION_API_URL; ?></p>
                                     <p><strong>API Key:</strong> <?php echo substr(EVOLUTION_API_KEY, 0, 10) . '...'; ?></p>

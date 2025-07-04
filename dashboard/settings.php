@@ -55,10 +55,8 @@ if ($_POST) {
                         'site_name' => 'string',
                         'timezone' => 'string',
                         'auto_billing_enabled' => 'boolean',
-                        'email_notifications' => 'boolean',
                         'whatsapp_delay_seconds' => 'number',
-                        'max_retry_attempts' => 'number',
-                        'backup_enabled' => 'boolean'
+                        'max_retry_attempts' => 'number'
                     ];
                     
                     foreach ($allowed_settings as $key => $type) {
@@ -89,8 +87,57 @@ if ($_POST) {
                         }
                     }
                     
+                    // Processar upload do favicon
+                    if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
+                        $favicon_file = $_FILES['favicon'];
+                        
+                        // Validar tipo de arquivo
+                        $allowed_types = ['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/jpeg', 'image/gif'];
+                        $file_type = $favicon_file['type'];
+                        $file_info = getimagesize($favicon_file['tmp_name']);
+                        
+                        if (!in_array($file_type, $allowed_types) && !$file_info) {
+                            throw new Exception("Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.");
+                        }
+                        
+                        // Validar tamanho (máximo 1MB)
+                        if ($favicon_file['size'] > 1024 * 1024) {
+                            throw new Exception("Arquivo muito grande. Máximo 1MB.");
+                        }
+                        
+                        // Gerar nome único para o arquivo
+                        $file_extension = pathinfo($favicon_file['name'], PATHINFO_EXTENSION);
+                        if (empty($file_extension)) {
+                            $file_extension = 'ico';
+                        }
+                        $new_filename = 'favicon_' . time() . '.' . $file_extension;
+                        $upload_path = __DIR__ . '/../public/uploads/' . $new_filename;
+                        $web_path = '/public/uploads/' . $new_filename;
+                        
+                        // Mover arquivo para diretório de uploads
+                        if (move_uploaded_file($favicon_file['tmp_name'], $upload_path)) {
+                            // Remover favicon anterior se existir
+                            $old_favicon = $appSettings->get('favicon_path');
+                            if ($old_favicon && $old_favicon !== '/favicon.ico' && file_exists(__DIR__ . '/..' . $old_favicon)) {
+                                unlink(__DIR__ . '/..' . $old_favicon);
+                            }
+                            
+                            // Salvar novo caminho no banco
+                            if ($appSettings->set('favicon_path', $web_path, 'Caminho para o favicon do site', 'string')) {
+                                $updated++;
+                                $message .= " Favicon atualizado com sucesso!";
+                            }
+                        } else {
+                            throw new Exception("Erro ao fazer upload do favicon.");
+                        }
+                    }
+                    
                     if ($updated > 0) {
-                        $message = "Configurações atualizadas com sucesso! ($updated alterações)";
+                        if (empty($message)) {
+                            $message = "Configurações atualizadas com sucesso! ($updated alterações)";
+                        } else {
+                            $message = "Configurações atualizadas com sucesso! ($updated alterações)" . $message;
+                        }
                         
                         // Atualizar timezone se foi alterado
                         if (isset($_POST['timezone'])) {
@@ -98,39 +145,6 @@ if ($_POST) {
                         }
                     } else {
                         $error = "Nenhuma configuração foi alterada.";
-                    }
-                    break;
-                    
-                case 'test_email':
-                    $admin_email = $appSettings->getAdminEmail();
-                    
-                    if (empty($admin_email)) {
-                        throw new Exception("Email do administrador não configurado");
-                    }
-                    
-                    $subject = "Teste de Email - " . $appSettings->getSiteName();
-                    $message_body = "
-                    <html>
-                    <body>
-                        <h2>Teste de Email</h2>
-                        <p>Este é um email de teste do sistema ClientManager Pro.</p>
-                        <p><strong>Data/Hora:</strong> " . date('d/m/Y H:i:s') . "</p>
-                        <p><strong>Servidor:</strong> " . $_SERVER['SERVER_NAME'] . "</p>
-                        <p>Se você recebeu este email, a configuração está funcionando corretamente!</p>
-                    </body>
-                    </html>";
-                    
-                    $headers = [
-                        'MIME-Version: 1.0',
-                        'Content-type: text/html; charset=UTF-8',
-                        'From: ' . $appSettings->getSiteName() . ' <noreply@clientmanager.com>',
-                        'Reply-To: ' . $admin_email
-                    ];
-                    
-                    if (mail($admin_email, $subject, $message_body, implode("\r\n", $headers))) {
-                        $message = "Email de teste enviado com sucesso para: " . $admin_email;
-                    } else {
-                        $error = "Falha ao enviar email de teste. Verifique a configuração do servidor.";
                     }
                     break;
             }
@@ -162,7 +176,8 @@ $timezones = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - ClientManager Pro</title>
+    <title><?php echo SITE_NAME; ?> - Configurações</title>
+    <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -172,7 +187,7 @@ $timezones = [
         <div class="hidden md:flex md:w-64 md:flex-col">
             <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-gray-800 text-gray-100 border-r border-gray-700">
                 <div class="flex items-center flex-shrink-0 px-4">
-                    <h1 class="text-2xl font-extrabold text-white">ClientManager Pro</h1>
+                    <h1 class="text-2xl font-extrabold text-white"><?php echo SITE_NAME; ?></h1>
                 </div>
                 <div class="mt-5 flex-grow flex flex-col">
                     <nav class="flex-1 px-2 space-y-1">
@@ -275,7 +290,7 @@ $timezones = [
                             <div class="px-6 py-6 sm:p-8">
                                 <h3 class="text-xl font-semibold text-gray-900 mb-6">Configurações Gerais</h3>
                                 
-                                <form method="POST" class="space-y-6">
+                                <form method="POST" enctype="multipart/form-data" class="space-y-6">
                                     <input type="hidden" name="action" value="update_settings">
                                     
                                     <!-- Configurações Básicas -->
@@ -285,7 +300,7 @@ $timezones = [
                                             <input type="text" name="site_name" id="site_name" 
                                                    value="<?php echo htmlspecialchars($all_settings['site_name']['value'] ?? ''); ?>"
                                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                            <p class="mt-1 text-xs text-gray-500">Nome exibido nos emails e relatórios</p>
+                                            <p class="mt-1 text-xs text-gray-500">Nome exibido no sistema e nos emails</p>
                                         </div>
                                         
                                         <div>
@@ -307,6 +322,20 @@ $timezones = [
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="favicon" class="block text-sm font-medium text-gray-700">Favicon do Site</label>
+                                            <input type="file" name="favicon" id="favicon" accept=".ico,.png,.jpg,.jpeg,.gif"
+                                                   class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                            <p class="mt-1 text-xs text-gray-500">Formatos: ICO, PNG, JPG, GIF (máx. 1MB)</p>
+                                            <?php if (!empty($all_settings['favicon_path']['value'])): ?>
+                                                <div class="mt-2 flex items-center">
+                                                    <img src="<?php echo htmlspecialchars($all_settings['favicon_path']['value']); ?>" 
+                                                         alt="Favicon atual" class="w-4 h-4 mr-2">
+                                                    <span class="text-xs text-gray-600">Favicon atual</span>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                         
                                         <div>
@@ -337,25 +366,8 @@ $timezones = [
                                                        <?php echo ($all_settings['auto_billing_enabled']['value'] ?? false) ? 'checked' : ''; ?>
                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 <label for="auto_billing_enabled" class="ml-2 block text-sm text-gray-700">
-                                                    Cobrança Automática Ativa
-                                                </label>
-                                            </div>
-                                            
-                                            <div class="flex items-center">
-                                                <input type="checkbox" name="email_notifications" id="email_notifications" 
-                                                       <?php echo ($all_settings['email_notifications']['value'] ?? false) ? 'checked' : ''; ?>
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="email_notifications" class="ml-2 block text-sm text-gray-700">
-                                                    Notificações por Email
-                                                </label>
-                                            </div>
-                                            
-                                            <div class="flex items-center">
-                                                <input type="checkbox" name="backup_enabled" id="backup_enabled" 
-                                                       <?php echo ($all_settings['backup_enabled']['value'] ?? false) ? 'checked' : ''; ?>
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="backup_enabled" class="ml-2 block text-sm text-gray-700">
-                                                    Backup Automático
+                                                    <strong>Cobrança Automática Ativa</strong>
+                                                    <span class="block text-xs text-gray-500">Enviar mensagens automáticas de cobrança via cron job</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -367,24 +379,6 @@ $timezones = [
                                             Salvar Configurações
                                         </button>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Teste de Email -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
-                            <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Teste de Email</h3>
-                                <p class="text-gray-600 mb-4">
-                                    Envie um email de teste para verificar se as configurações estão funcionando corretamente.
-                                </p>
-                                
-                                <form method="POST" class="inline">
-                                    <input type="hidden" name="action" value="test_email">
-                                    <button type="submit" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
-                                        <i class="fas fa-paper-plane mr-2"></i>
-                                        Enviar Email de Teste
-                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -424,6 +418,18 @@ $timezones = [
                                         <strong>Nível de Acesso:</strong><br>
                                         <span class="text-red-600 font-medium">Administrador</span>
                                     </div>
+                                    
+                                    <div>
+                                        <strong>Cobrança Automática:</strong><br>
+                                        <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
+                                            <?php echo $appSettings->isAutoBillingEnabled() ? 'Ativa' : 'Inativa'; ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Diretório de Uploads:</strong><br>
+                                        <span class="text-gray-600"><?php echo is_writable(__DIR__ . '/../public/uploads') ? 'Gravável' : 'Não gravável'; ?></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -432,6 +438,57 @@ $timezones = [
             </main>
         </div>
     </div>
+
+    <script>
+        // Preview do favicon antes do upload
+        document.getElementById('favicon').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Criar preview se não existir
+                    let preview = document.getElementById('favicon-preview');
+                    if (!preview) {
+                        preview = document.createElement('div');
+                        preview.id = 'favicon-preview';
+                        preview.className = 'mt-2 flex items-center';
+                        e.target.parentNode.appendChild(preview);
+                    }
+                    
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview do favicon" class="w-4 h-4 mr-2">
+                        <span class="text-xs text-gray-600">Preview do novo favicon</span>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Validação do formulário
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const siteName = document.getElementById('site_name').value.trim();
+            const adminEmail = document.getElementById('admin_email').value.trim();
+            
+            if (!siteName) {
+                alert('Nome do site é obrigatório');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!adminEmail) {
+                alert('Email do administrador é obrigatório');
+                e.preventDefault();
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(adminEmail)) {
+                alert('Email do administrador inválido');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
 </body>
 </html>
-```

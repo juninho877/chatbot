@@ -53,6 +53,7 @@ function getAppSetting($key, $default = null) {
 // Definir constantes baseadas nas configurações do banco
 define('ADMIN_EMAIL', getAppSetting('admin_email', 'admin@clientmanager.com'));
 define('SITE_NAME', getAppSetting('site_name', 'ClientManager Pro'));
+define('FAVICON_PATH', getAppSetting('favicon_path', '/favicon.ico'));
 
 // Atualizar timezone se configurado no banco
 $db_timezone = getAppSetting('timezone', 'America/Sao_Paulo');

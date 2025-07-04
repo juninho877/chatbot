@@ -410,6 +410,7 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                             <?php endif; ?>
                                         </div>
                                         
+                                        <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
                                             <i class="fas fa-save mr-2"></i>
                                             <i class="fas fa-save mr-2"></i>
                                             Salvar Configurações

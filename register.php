@@ -49,15 +49,16 @@ $plan = $stmt->fetch(PDO::FETCH_ASSOC);
     <title><?php echo SITE_NAME; ?> - Registro</title>
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="dashboard/css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-slate-900">
     <div class="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-slate-100">
                     Crie sua conta
                 </h2>
-                <p class="mt-2 text-center text-sm text-gray-600">
+                <p class="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
                     Plano selecionado: <strong><?php echo $plan['name']; ?></strong> - R$ <?php echo number_format($plan['price'], 2, ',', '.'); ?>/mês
                 </p>
             </div>
@@ -71,47 +72,60 @@ $plan = $stmt->fetch(PDO::FETCH_ASSOC);
             <form class="mt-8 space-y-6" method="POST">
                 <input type="hidden" name="plan_id" value="<?php echo $plan_id; ?>">
                 
-                <div class="space-y-4">
+                <div class="space-y-4 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Nome completo</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome completo</label>
                         <input id="name" name="name" type="text" required 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                     </div>
                     
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Email</label>
                         <input id="email" name="email" type="email" required 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                     </div>
                     
                     <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700">Telefone/WhatsApp</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone/WhatsApp</label>
                         <input id="phone" name="phone" type="tel" required 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                placeholder="(11) 99999-9999">
                     </div>
                     
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Senha</label>
                         <input id="password" name="password" type="password" required minlength="6"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                     </div>
-                </div>
 
-                <div>
-                    <button type="submit" 
-                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Criar Conta e Prosseguir para Pagamento
-                    </button>
-                </div>
-                
-                <div class="text-center">
-                    <a href="login.php" class="text-blue-600 hover:text-blue-500">
-                        Já tem uma conta? Faça login
-                    </a>
+                    <div>
+                        <button type="submit" 
+                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Criar Conta e Prosseguir para Pagamento
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="login.php" class="text-blue-600 hover:text-blue-500">
+                            Já tem uma conta? Faça login
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+    
+    <script>
+        // Dark Mode Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved dark mode preference or default to light mode
+            const savedTheme = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'enabled' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        });
+    </script>
 </body>
 </html>

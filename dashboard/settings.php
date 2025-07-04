@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../classes/AppSettings.php';
-require_once __DIR__ . '/../classes/AppSettings.php';
 
 // Verificar se está logado
 if (!isset($_SESSION['user_id'])) {
@@ -179,16 +178,17 @@ if ($_POST) {
                         if (isset($favicon_message)) {
                             $success_message .= $favicon_message;
                         }
+                    }
                         $_SESSION['message'] = $success_message;
                         
                         // Atualizar timezone se foi alterado
                         if (isset($_POST['timezone'])) {
                             date_default_timezone_set($_POST['timezone']);
                         }
-                        }
                     } else {
                         $_SESSION['error'] = "Nenhuma configuração foi alterada.";
                     }
+                    
                     
                     // Redirecionar para evitar reenvio
                     redirect("settings.php");
@@ -526,51 +526,6 @@ $timezones = [
                                     </div>
                                     
                                     <div>
-                                        <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Informações do Sistema -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
-                            <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Informações do Sistema</h3>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <strong>Última Execução do Cron:</strong><br>
-                                        <span class="text-gray-600"><?php echo htmlspecialchars($appSettings->getCronLastRun()); ?></span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Timezone Atual:</strong><br>
-                                        <span class="text-gray-600"><?php echo date_default_timezone_get(); ?></span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Data/Hora Atual:</strong><br>
-                                        <span class="text-gray-600"><?php echo date('d/m/Y H:i:s'); ?></span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Versão do PHP:</strong><br>
-                                        <span class="text-gray-600"><?php echo phpversion(); ?></span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Usuário Logado:</strong><br>
-                                        <span class="text-gray-600"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Nível de Acesso:</strong><br>
-                                        <span class="text-red-600 font-medium">Administrador</span>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong>Cobrança Automática:</strong><br>
                                         <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
                                             <?php echo $appSettings->isAutoBillingEnabled() ? 'Ativa' : 'Inativa'; ?>
                                         </span>

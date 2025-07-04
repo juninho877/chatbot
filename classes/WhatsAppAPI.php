@@ -360,23 +360,26 @@ class WhatsAppAPI {
         error_log("Instance: " . $instanceName);
         error_log("Webhook URL: " . $webhookUrl);
         
-        // Estrutura correta do payload para Evolution API v2
+        // Estrutura correta do payload para Evolution API v2 - CORRIGIDA
+        // O webhook deve estar aninhado dentro de um objeto "webhook"
         $data = [
-            'url' => $webhookUrl,
-            'enabled' => true,
-            'events' => [
-                'QRCODE_UPDATED',
-                'MESSAGES_UPSERT', 
-                'MESSAGES_UPDATE',
-                'MESSAGES_DELETE',
-                'SEND_MESSAGE',
-                'CONNECTION_UPDATE'
-            ],
-            'webhook_by_events' => false,
-            'webhook_base64' => false
+            'webhook' => [
+                'enabled' => true,
+                'url' => $webhookUrl,
+                'webhookByEvents' => false,
+                'webhookBase64' => false,
+                'events' => [
+                    'QRCODE_UPDATED',
+                    'MESSAGES_UPSERT', 
+                    'MESSAGES_UPDATE',
+                    'MESSAGES_DELETE',
+                    'SEND_MESSAGE',
+                    'CONNECTION_UPDATE'
+                ]
+            ]
         ];
         
-        error_log("Webhook payload: " . json_encode($data, JSON_PRETTY_PRINT));
+        error_log("Webhook payload (CORRECTED): " . json_encode($data, JSON_PRETTY_PRINT));
         
         $result = $this->makeRequest("/webhook/set/{$instanceName}", 'POST', $data);
         

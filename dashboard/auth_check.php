@@ -69,15 +69,20 @@ try {
     $user->notify_on_due_date = (bool)$user_data['notify_on_due_date'];
     $user->notify_1_day_after_due = (bool)$user_data['notify_1_day_after_due'];
     
-    // Verificar se o plano está ativo
-    if (!$user->isPlanActive()) {
-        error_log("Auth check failed: Plan not active for user " . $_SESSION['user_id']);
-        error_log("Subscription status: " . $user->subscription_status);
-        error_log("Trial ends at: " . $user->trial_ends_at);
-        error_log("Plan expires at: " . $user->plan_expires_at);
-        
-        // Redirecionar para página de assinatura expirada
-        redirect("subscription_expired.php");
+    // PRIVILÉGIO ESPECIAL PARA ADMIN: Administradores não têm restrições de assinatura
+    if ($user->role !== 'admin') {
+        // Verificar se o plano está ativo apenas para usuários não-admin
+        if (!$user->isPlanActive()) {
+            error_log("Auth check failed: Plan not active for user " . $_SESSION['user_id']);
+            error_log("Subscription status: " . $user->subscription_status);
+            error_log("Trial ends at: " . $user->trial_ends_at);
+            error_log("Plan expires at: " . $user->plan_expires_at);
+            
+            // Redirecionar para página de assinatura expirada
+            redirect("subscription_expired.php");
+        }
+    } else {
+        error_log("Auth check: Admin user " . $_SESSION['user_id'] . " bypassing subscription check");
     }
     
     // Atualizar dados na sessão para manter sincronizado
@@ -94,7 +99,7 @@ try {
     // Disponibilizar objeto user para as páginas
     $current_user = $user;
     
-    error_log("Auth check passed for user " . $_SESSION['user_id'] . " (" . $user->email . ")");
+    error_log("Auth check passed for user " . $_SESSION['user_id'] . " (" . $user->email . ") - Role: " . $user->role);
     
 } catch (Exception $e) {
     error_log("Auth check error: " . $e->getMessage());

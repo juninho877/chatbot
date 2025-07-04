@@ -62,11 +62,19 @@ class User {
         $this->notify_on_due_date = $this->notify_on_due_date ?? true;
         $this->notify_1_day_after_due = $this->notify_1_day_after_due ?? false;
 
-        // Definir período de teste de 3 dias para novos usuários
-        $this->trial_starts_at = date('Y-m-d H:i:s');
-        $this->trial_ends_at = date('Y-m-d H:i:s', strtotime('+3 days'));
-        $this->subscription_status = 'trial';
-        $this->plan_expires_at = $this->trial_ends_at; // O plano expira junto com o teste
+        // Definir período de teste de 3 dias para novos usuários (exceto admins)
+        if ($this->role !== 'admin') {
+            $this->trial_starts_at = date('Y-m-d H:i:s');
+            $this->trial_ends_at = date('Y-m-d H:i:s', strtotime('+3 days'));
+            $this->subscription_status = 'trial';
+            $this->plan_expires_at = $this->trial_ends_at; // O plano expira junto com o teste
+        } else {
+            // Admins não têm período de teste - assinatura ativa permanente
+            $this->trial_starts_at = null;
+            $this->trial_ends_at = null;
+            $this->subscription_status = 'active';
+            $this->plan_expires_at = null; // Sem expiração para admins
+        }
 
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
@@ -173,6 +181,53 @@ class User {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
+    }
+
+    public function readOne() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+        
+        if($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->name = $row['name'];
+            $this->email = $row['email'];
+            $this->phone = $row['phone'];
+            $this->plan_id = $row['plan_id'];
+            $this->role = $row['role'];
+            $this->whatsapp_instance = $row['whatsapp_instance'];
+            $this->whatsapp_connected = $row['whatsapp_connected'];
+            $this->trial_starts_at = $row['trial_starts_at'];
+            $this->trial_ends_at = $row['trial_ends_at'];
+            $this->subscription_status = $row['subscription_status'];
+            $this->plan_expires_at = $row['plan_expires_at'];
+            return true;
+        }
+        return false;
+    }
+
+    public function update() {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET name=:name, email=:email, phone=:phone, plan_id=:plan_id, role=:role
+                  WHERE id=:id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":name", $this->name);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":phone", $this->phone);
+        $stmt->bindParam(":plan_id", $this->plan_id);
+        $stmt->bindParam(":role", $this->role);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function updateWhatsAppInstance($instance_name) {
@@ -323,6 +378,11 @@ class User {
      * Verificar se o plano está ativo (não expirado)
      */
     public function isPlanActive() {
+        // PRIVILÉGIO ESPECIAL: Administradores sempre têm plano ativo
+        if ($this->role === 'admin') {
+            return true;
+        }
+        
         if ($this->subscription_status === 'active') {
             return true;
         }

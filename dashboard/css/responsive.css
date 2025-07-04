@@ -42,7 +42,7 @@
 /* Ajustes para o menu lateral em dispositivos móveis */
 .sidebar-mobile {
     position: fixed;
-    top: 0;
+    top: 0; 
     left: 0;
     bottom: 0;
     width: 80%;
@@ -69,6 +69,33 @@
 
 .sidebar-overlay.open {
     display: block;
+}
+
+/* Estilos para o botão flutuante do menu */
+.sidebar-toggle-button {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: #3B82F6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar-toggle-button:hover {
+    background-color: #2563EB;
+    transform: scale(1.05);
+}
+
+.sidebar-toggle-button:active {
+    transform: scale(0.95);
 }
 
 /* Ajustes para modais em dispositivos móveis */

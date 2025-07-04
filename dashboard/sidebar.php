@@ -8,13 +8,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Mobile header - Visível apenas em telas pequenas -->
 <div class="md:hidden bg-gray-800 text-white flex items-center justify-between p-4 shadow-md">
     <h1 class="text-xl font-bold"><?php echo SITE_NAME; ?></h1>
-    <button onclick="toggleSidebar()" class="text-white focus:outline-none">
-        <i class="fas fa-bars text-xl"></i>
-    </button>
 </div>
 
 <!-- Overlay para o menu mobile -->
 <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+<!-- Botão flutuante para abrir o menu em dispositivos móveis -->
+<button onclick="toggleSidebar()" class="md:hidden fixed bottom-4 left-4 bg-blue-600 text-white p-3 rounded-full shadow-lg z-50 focus:outline-none transition duration-150 ease-in-out">
+    <i class="fas fa-bars text-xl"></i>
+</button>
 
 <!-- Sidebar para desktop (sempre visível em md+) e mobile (toggle) -->
 <div id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40 md:static md:z-0 md:h-screen flex flex-col w-64 bg-gray-800 text-gray-100 border-r border-gray-700">

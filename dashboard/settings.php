@@ -8,15 +8,34 @@ if (!isset($_SESSION['user_id'])) {
     redirect("../login.php");
 }
 
-// Verificar se é administrador usando role
-if ($_SESSION['user_role'] !== 'admin') {
+$database = new Database();
+$db = $database->getConnection();
+
+// Verificar se é administrador usando role com fallback
+$is_admin = false;
+if (isset($_SESSION['user_role'])) {
+    $is_admin = ($_SESSION['user_role'] === 'admin');
+} else {
+    // Fallback: verificar no banco de dados se a role não estiver na sessão
+    $query = "SELECT role FROM users WHERE id = :user_id LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user_role = $row['role'] ?? 'user';
+        $_SESSION['user_role'] = $user_role; // Atualizar sessão
+        $is_admin = ($user_role === 'admin');
+    }
+}
+
+// Verificar se é administrador
+if (!$is_admin) {
     // Redirecionar para dashboard com mensagem de erro
     $_SESSION['error_message'] = 'Acesso negado. Apenas administradores podem acessar as configurações do sistema.';
     redirect("index.php");
 }
 
-$database = new Database();
-$db = $database->getConnection();
 $appSettings = new AppSettings($db);
 
 $message = '';
@@ -415,3 +434,4 @@ $timezones = [
     </div>
 </body>
 </html>
+```

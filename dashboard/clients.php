@@ -15,8 +15,23 @@ $client = new Client($db);
 $message = '';
 $error = '';
 
-// Verificar se é administrador usando role
-$is_admin = ($_SESSION['user_role'] === 'admin');
+// Verificar se é administrador usando role com fallback
+$is_admin = false;
+if (isset($_SESSION['user_role'])) {
+    $is_admin = ($_SESSION['user_role'] === 'admin');
+} else {
+    // Fallback: verificar no banco de dados se a role não estiver na sessão
+    $query = "SELECT role FROM users WHERE id = :user_id LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user_role = $row['role'] ?? 'user';
+        $_SESSION['user_role'] = $user_role; // Atualizar sessão
+        $is_admin = ($user_role === 'admin');
+    }
+}
 
 // Processar ações
 if ($_POST) {
@@ -572,3 +587,4 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </script>
 </body>
 </html>
+```

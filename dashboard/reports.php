@@ -14,6 +14,24 @@ $db = $database->getConnection();
 $client = new Client($db);
 $messageHistory = new MessageHistory($db);
 
+// Verificar se é administrador usando role com fallback
+$is_admin = false;
+if (isset($_SESSION['user_role'])) {
+    $is_admin = ($_SESSION['user_role'] === 'admin');
+} else {
+    // Fallback: verificar no banco de dados se a role não estiver na sessão
+    $query = "SELECT role FROM users WHERE id = :user_id LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user_role = $row['role'] ?? 'user';
+        $_SESSION['user_role'] = $user_role; // Atualizar sessão
+        $is_admin = ($user_role === 'admin');
+    }
+}
+
 // Buscar estatísticas gerais
 $stats = $messageHistory->getStatistics($_SESSION['user_id']);
 
@@ -103,6 +121,13 @@ $daily_messages = $stmt->fetchAll();
                             <i class="fas fa-chart-bar mr-3"></i>
                             Relatórios
                         </a>
+                        <?php if ($is_admin): ?>
+                        <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            <i class="fas fa-cog mr-3"></i>
+                            Configurações
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
+                        </a>
+                        <?php endif; ?>
                     </nav>
                 </div>
                 <div class="flex-shrink-0 flex border-t border-gray-700 p-4">
@@ -110,7 +135,12 @@ $daily_messages = $stmt->fetchAll();
                         <div class="flex items-center">
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-200"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white">Sair</a>
+                                <?php if ($is_admin): ?>
+                                    <span class="text-xs font-medium text-yellow-400">Administrador</span>
+                                <?php else: ?>
+                                    <span class="text-xs font-medium text-gray-400">Usuário</span>
+                                <?php endif; ?>
+                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
                             </div>
                         </div>
                     </div>

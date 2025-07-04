@@ -20,6 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Responder a requisições GET (validação de webhook)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    error_log("=== WEBHOOK VALIDATION REQUEST ===");
+    error_log("GET request received for webhook validation");
+    
+    // Resposta de validação para a Evolution API
+    http_response_code(200);
+    echo json_encode([
+        'status' => 'ok',
+        'message' => 'Webhook endpoint is active and ready to receive notifications',
+        'service' => 'ClientManager Pro WhatsApp Webhook',
+        'timestamp' => date('Y-m-d H:i:s'),
+        'methods_supported' => ['POST', 'GET', 'OPTIONS']
+    ]);
+    exit();
+}
+
 // Log de início
 error_log("=== WEBHOOK RECEIVED ===");
 error_log("Method: " . $_SERVER['REQUEST_METHOD']);

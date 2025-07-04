@@ -253,6 +253,10 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                             <i class="fas fa-chart-bar mr-3"></i>
                             Relatórios
                         </a>
+                        <a href="user_settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            <i class="fas fa-user-cog mr-3"></i>
+                            Minhas Configurações
+                        </a>
                         <?php if ($is_admin): ?>
                         <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-cog mr-3"></i>

@@ -81,79 +81,18 @@ $daily_messages = $stmt->fetchAll();
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Relatórios - ClientManager Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Sidebar -->
     <div class="flex h-screen bg-gray-100">
-        <div class="hidden md:flex md:w-64 md:flex-col">
-            <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-gray-800 text-gray-100 border-r border-gray-700">
-                <div class="flex items-center flex-shrink-0 px-4">
-                    <h1 class="text-2xl font-extrabold text-white">ClientManager Pro</h1>
-                </div>
-                <div class="mt-5 flex-grow flex flex-col">
-                    <nav class="flex-1 px-2 space-y-1">
-                        <a href="index.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-home mr-3"></i>
-                            Dashboard
-                        </a>
-                        <a href="clients.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-users mr-3"></i>
-                            Clientes
-                        </a>
-                        <a href="messages.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fab fa-whatsapp mr-3"></i>
-                            Mensagens
-                        </a>
-                        <a href="templates.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-template mr-3"></i>
-                            Templates
-                        </a>
-                        <a href="whatsapp.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-qrcode mr-3"></i>
-                            WhatsApp
-                        </a>
-                        <a href="reports.php" class="bg-blue-600 text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-chart-bar mr-3"></i>
-                            Relatórios
-                        </a>
-                        <a href="user_settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-user-cog mr-3"></i>
-                            Minhas Configurações
-                        </a>
-                        <?php if ($is_admin): ?>
-                        <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                            <i class="fas fa-cog mr-3"></i>
-                            Configurações
-                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
-                        </a>
-                        <?php endif; ?>
-                    </nav>
-                </div>
-                <div class="flex-shrink-0 flex border-t border-gray-700 p-4">
-                    <div class="flex-shrink-0 w-full group block">
-                        <div class="flex items-center">
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-200"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                                <?php if ($is_admin): ?>
-                                    <span class="text-xs font-medium text-yellow-400">Administrador</span>
-                                <?php else: ?>
-                                    <span class="text-xs font-medium text-gray-400">Usuário</span>
-                                <?php endif; ?>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
-        <div class="flex flex-col w-0 flex-1 overflow-hidden">
+        <div class="flex flex-col w-full md:w-0 md:flex-1 overflow-hidden">
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -164,7 +103,7 @@ $daily_messages = $stmt->fetchAll();
                         <!-- Estatísticas Principais -->
                         <div class="mt-8">
                             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -180,7 +119,7 @@ $daily_messages = $stmt->fetchAll();
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -196,7 +135,7 @@ $daily_messages = $stmt->fetchAll();
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -212,7 +151,7 @@ $daily_messages = $stmt->fetchAll();
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">

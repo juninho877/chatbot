@@ -1,0 +1,112 @@
+/* Estilos responsivos adicionais para o dashboard */
+
+/* Ajustes para telas pequenas */
+@media (max-width: 640px) {
+    .dashboard-card {
+        padding: 1rem !important;
+    }
+    
+    .dashboard-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .mobile-full-width {
+        width: 100% !important;
+    }
+    
+    .mobile-stack {
+        flex-direction: column !important;
+    }
+    
+    .mobile-stack > * {
+        margin-bottom: 0.5rem !important;
+        margin-right: 0 !important;
+    }
+    
+    .mobile-text-sm {
+        font-size: 0.875rem !important;
+    }
+    
+    .mobile-text-xs {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Ajustes para o menu lateral em dispositivos móveis */
+.sidebar-mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 300px;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-mobile.open {
+    transform: translateX(0);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    display: none;
+}
+
+.sidebar-overlay.open {
+    display: block;
+}
+
+/* Ajustes para modais em dispositivos móveis */
+@media (max-width: 640px) {
+    .modal-content {
+        width: 95% !important;
+        margin: 1rem auto !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+    
+    .modal-form-grid {
+        display: block !important;
+    }
+    
+    .modal-form-grid > * {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Melhorias de acessibilidade para toque */
+@media (max-width: 768px) {
+    .touch-target {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    button, 
+    [role="button"],
+    a.button,
+    input[type="button"],
+    input[type="submit"] {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .touch-action-none {
+        touch-action: none;
+    }
+}

@@ -98,18 +98,15 @@ if ($_POST) {
                         if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
                             $_SESSION['error'] = "Email do administrador inválido";
                             redirect("settings.php");
-                            redirect("settings.php");
                         }
                         
                         if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
                             $_SESSION['error'] = "Delay do WhatsApp deve estar entre 1 e 60 segundos";
                             redirect("settings.php");
-                            redirect("settings.php");
                         }
                         
                         if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
                             $_SESSION['error'] = "Máximo de tentativas deve estar entre 1 e 10";
-                            redirect("settings.php");
                             redirect("settings.php");
                         }
                         
@@ -130,14 +127,12 @@ if ($_POST) {
                         
                         if (!in_array($file_type, $allowed_types) && !$file_info) {
                             $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
-                            redirect("settings.php");
                         }
                         
                         // Validar tamanho (máximo 1MB)
                         if ($favicon_file['size'] > 1024 * 1024) {
                             $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
                             redirect("settings.php");
-                        }
                         
                         // Criar diretório de uploads se não existir
                         $upload_dir = __DIR__ . '/../public/uploads/';
@@ -165,12 +160,11 @@ if ($_POST) {
                             // Salvar novo caminho no banco
                             if ($appSettings->set('favicon_path', $web_path, 'Caminho para o favicon do site', 'string')) {
                                 $updated++;
-                                $favicon_message = " Favicon atualizado com sucesso!";
+                                $favicon_message = "Favicon atualizado com sucesso!";
                             }
                         } else {
                             $_SESSION['error'] = "Erro ao fazer upload do favicon.";
                             redirect("settings.php");
-                        }
                     }
                     
                     if ($updated > 0) {
@@ -178,15 +172,7 @@ if ($_POST) {
                         if (isset($favicon_message)) {
                             $success_message .= $favicon_message;
                         }
-                    }
-                        $_SESSION['message'] = $success_message;
-                        
-                        // Atualizar timezone se foi alterado
-                        if (isset($_POST['timezone'])) {
-                            date_default_timezone_set($_POST['timezone']);
-                        }
-                    } else {
-                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
+                            $success_message .= " " . $favicon_message;
                     }
                     
                     
@@ -197,7 +183,6 @@ if ($_POST) {
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Erro: " . $e->getMessage();
-        redirect("settings.php");
     }
 }
 
@@ -259,7 +244,15 @@ $timezones = [
                                 </div>
                             </div>
                         <?php endif; ?>
-                        
+                        $_SESSION['message'] = $success_message;
+                    } else {
+                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
+                    }
+                    
+                    // Atualizar timezone se foi alterado
+                    if (isset($_POST['timezone'])) {
+                        date_default_timezone_set($_POST['timezone']);
+                    }
                         <?php if ($error): ?>
                             <div class="mt-4 bg-red-100 border-red-400 text-red-800 p-4 rounded-lg shadow-sm">
                                 <div class="flex">

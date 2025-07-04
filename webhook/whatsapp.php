@@ -108,6 +108,22 @@ try {
 }
 
 /**
+ * Função para limpar ID da mensagem do WhatsApp removendo sufixos
+ */
+function cleanWhatsAppMessageId($message_id) {
+    if (empty($message_id)) {
+        return null;
+    }
+    
+    // Remover sufixos como _0, _1, etc.
+    $cleaned_id = preg_replace('/_\d+$/', '', $message_id);
+    
+    error_log("Webhook - Cleaned WhatsApp message ID: '$message_id' -> '$cleaned_id'");
+    
+    return $cleaned_id;
+}
+
+/**
  * Processar atualizações de status de mensagem
  */
 function handleMessageUpdate($payload, $messageHistory) {
@@ -156,8 +172,11 @@ function handleConnectionUpdate($payload) {
 function processMessageStatus($message_data, $messageHistory) {
     try {
         // Extrair informações da mensagem
-        $message_id = $message_data['key']['id'] ?? null;
+        $raw_message_id = $message_data['key']['id'] ?? null;
         $status = null;
+        
+        // Limpar o ID da mensagem removendo sufixos
+        $message_id = cleanWhatsAppMessageId($raw_message_id);
         
         // Determinar o status baseado nos dados recebidos
         if (isset($message_data['status'])) {
@@ -176,14 +195,29 @@ function processMessageStatus($message_data, $messageHistory) {
             return;
         }
         
-        error_log("Processing message ID: $message_id, Status: $status");
+        error_log("Processing message ID: $message_id (raw: $raw_message_id), Status: $status");
         
-        // Buscar mensagem no histórico
+        // Buscar mensagem no histórico usando o ID limpo
         $message_record = $messageHistory->getByWhatsAppMessageId($message_id);
         
         if (!$message_record) {
             error_log("Message not found in database: $message_id");
-            return;
+            
+            // Tentar buscar com o ID original (fallback)
+            if ($raw_message_id !== $message_id) {
+                error_log("Trying fallback search with raw ID: $raw_message_id");
+                $message_record = $messageHistory->getByWhatsAppMessageId($raw_message_id);
+                
+                if (!$message_record) {
+                    error_log("Message not found even with raw ID: $raw_message_id");
+                    return;
+                } else {
+                    error_log("Found message with raw ID, will update using raw ID");
+                    $message_id = $raw_message_id; // Use o ID original para a atualização
+                }
+            } else {
+                return;
+            }
         }
         
         // Atualizar status apenas se for uma progressão válida

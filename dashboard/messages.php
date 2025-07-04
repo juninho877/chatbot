@@ -39,6 +39,22 @@ if (isset($_SESSION['user_role'])) {
 $message = '';
 $error = '';
 
+/**
+ * Função para limpar ID da mensagem do WhatsApp removendo sufixos
+ */
+function cleanWhatsAppMessageId($message_id) {
+    if (empty($message_id)) {
+        return null;
+    }
+    
+    // Remover sufixos como _0, _1, etc.
+    $cleaned_id = preg_replace('/_\d+$/', '', $message_id);
+    
+    error_log("Cleaned WhatsApp message ID: '$message_id' -> '$cleaned_id'");
+    
+    return $cleaned_id;
+}
+
 // Processar ações
 if ($_POST) {
     try {
@@ -90,12 +106,21 @@ if ($_POST) {
                     // Enviar mensagem
                     $result = $whatsapp->sendMessage($instance_name, $client->phone, $message_text);
                     
+                    // Extrair e limpar ID da mensagem do WhatsApp se disponível
+                    $whatsapp_message_id = null;
+                    if (isset($result['data']['key']['id'])) {
+                        $raw_id = $result['data']['key']['id'];
+                        $whatsapp_message_id = cleanWhatsAppMessageId($raw_id);
+                        error_log("Raw WhatsApp message ID: '$raw_id', Cleaned: '$whatsapp_message_id'");
+                    }
+                    
                     // Registrar no histórico
                     $messageHistory->user_id = $_SESSION['user_id'];
                     $messageHistory->client_id = $client_id;
                     $messageHistory->template_id = $template_id;
                     $messageHistory->message = $message_text;
                     $messageHistory->phone = $client->phone;
+                    $messageHistory->whatsapp_message_id = $whatsapp_message_id;
                     $messageHistory->status = ($result['status_code'] == 200 || $result['status_code'] == 201) ? 'sent' : 'failed';
                     
                     if ($messageHistory->create()) {
@@ -156,12 +181,21 @@ if ($_POST) {
                             // Enviar mensagem
                             $result = $whatsapp->sendMessage($instance_name, $client->phone, $message_text);
                             
+                            // Extrair e limpar ID da mensagem do WhatsApp se disponível
+                            $whatsapp_message_id = null;
+                            if (isset($result['data']['key']['id'])) {
+                                $raw_id = $result['data']['key']['id'];
+                                $whatsapp_message_id = cleanWhatsAppMessageId($raw_id);
+                                error_log("Bulk message - Raw WhatsApp message ID: '$raw_id', Cleaned: '$whatsapp_message_id'");
+                            }
+                            
                             // Registrar no histórico
                             $messageHistory->user_id = $_SESSION['user_id'];
                             $messageHistory->client_id = $client_id;
                             $messageHistory->template_id = $template_id;
                             $messageHistory->message = $message_text;
                             $messageHistory->phone = $client->phone;
+                            $messageHistory->whatsapp_message_id = $whatsapp_message_id;
                             $messageHistory->status = ($result['status_code'] == 200 || $result['status_code'] == 201) ? 'sent' : 'failed';
                             $messageHistory->create();
                             

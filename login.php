@@ -25,13 +25,28 @@ if ($_POST) {
         }
         
         if ($user->login($email, $password)) {
+            // Armazenar informações completas na sessão
             $_SESSION['user_id'] = $user->id;
             $_SESSION['user_name'] = $user->name;
             $_SESSION['user_email'] = $user->email;
-            $_SESSION['user_role'] = $user->role; // Armazenar role na sessão
+            $_SESSION['user_role'] = $user->role;
             $_SESSION['plan_id'] = $user->plan_id;
             $_SESSION['whatsapp_instance'] = $user->whatsapp_instance;
             $_SESSION['whatsapp_connected'] = $user->whatsapp_connected;
+            
+            // Armazenar informações de assinatura e teste
+            $_SESSION['subscription_status'] = $user->subscription_status;
+            $_SESSION['trial_starts_at'] = $user->trial_starts_at;
+            $_SESSION['trial_ends_at'] = $user->trial_ends_at;
+            $_SESSION['plan_expires_at'] = $user->plan_expires_at;
+            
+            // Armazenar configurações de notificação
+            $_SESSION['notify_5_days_before'] = $user->notify_5_days_before;
+            $_SESSION['notify_3_days_before'] = $user->notify_3_days_before;
+            $_SESSION['notify_2_days_before'] = $user->notify_2_days_before;
+            $_SESSION['notify_1_day_before'] = $user->notify_1_day_before;
+            $_SESSION['notify_on_due_date'] = $user->notify_on_due_date;
+            $_SESSION['notify_1_day_after_due'] = $user->notify_1_day_after_due;
             
             redirect("dashboard/index.php");
         } else {

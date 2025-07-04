@@ -1,14 +1,8 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/auth_check.php'; // Middleware de autenticação
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../classes/Client.php';
 require_once __DIR__ . '/../classes/MessageTemplate.php';
-
-// Verificar se está logado
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
 
 $database = new Database();
 $db = $database->getConnection();
@@ -35,23 +29,11 @@ $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $messages_today = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Verificar se é administrador usando role com fallback
-$is_admin = false;
-if (isset($_SESSION['user_role'])) {
-    $is_admin = ($_SESSION['user_role'] === 'admin');
-} else {
-    // Fallback: verificar no banco de dados se a role não estiver na sessão
-    $query = "SELECT role FROM users WHERE id = :user_id LIMIT 1";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $_SESSION['user_id']);
-    $stmt->execute();
-    if ($stmt->rowCount() > 0) {
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $user_role = $row['role'] ?? 'user';
-        $_SESSION['user_role'] = $user_role; // Atualizar sessão
-        $is_admin = ($user_role === 'admin');
-    }
-}
+// Verificar se é administrador
+$is_admin = ($_SESSION['user_role'] === 'admin');
+
+// Obter informações da assinatura
+$subscription_info = $current_user->getSubscriptionInfo();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -135,6 +117,40 @@ if (isset($_SESSION['user_role'])) {
                         <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                     </div>
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        
+                        <!-- Status da Assinatura -->
+                        <?php if ($subscription_info['is_in_trial']): ?>
+                        <div class="mt-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-clock text-yellow-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-yellow-800">
+                                        <strong>Período de Teste:</strong>
+                                        Você tem <?php echo $subscription_info['trial_days_remaining']; ?> dias restantes do seu teste gratuito.
+                                        <a href="../payment.php?plan_id=<?php echo $_SESSION['plan_id']; ?>" class="font-medium underline">Assine agora</a>
+                                        para continuar usando todas as funcionalidades.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php elseif ($subscription_info['status'] === 'active'): ?>
+                        <div class="mt-4 bg-green-100 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-green-800">
+                                        <strong>Assinatura Ativa:</strong>
+                                        Sua assinatura está ativa até <?php echo date('d/m/Y', strtotime($subscription_info['plan_expires_at'])); ?>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <!-- Stats -->
                         <div class="mt-8">
                             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -50,21 +50,21 @@ try {
     }
     
     // Inicializar classes
-    $user = new User($db);
+    $user_obj = new User($db); // Renomeado para evitar conflito com $user_data
     $client = new Client($db);
     $template = new MessageTemplate($db);
     $messageHistory = new MessageHistory($db);
     $whatsapp = new WhatsAppAPI();
     $appSettings = new AppSettings($db);
     
-    // Verificar se a cobrança automática está ativa
+    // Verificar se a cobrança automática está ativa (globalmente)
     if (!$appSettings->isAutoBillingEnabled()) {
         error_log("Auto billing is disabled, skipping cron job");
         exit(0);
     }
     
     // Buscar todos os usuários com WhatsApp conectado
-    $users_stmt = $user->readAll();
+    $users_stmt = $user_obj->readAll(); // Usar $user_obj
     $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
     
     error_log("Found " . count($users) . " users with WhatsApp connected");
@@ -84,8 +84,18 @@ try {
                 continue;
             }
             
-            // 1. Clientes com vencimento em 5 dias (se habilitado)
-            if ($appSettings->isNotify5DaysBeforeEnabled()) {
+            // Obter configurações de notificação específicas do usuário
+            $user_notify_settings = [
+                'notify_5_days_before' => (bool)($user_data['notify_5_days_before'] ?? false),
+                'notify_3_days_before' => (bool)($user_data['notify_3_days_before'] ?? true),
+                'notify_2_days_before' => (bool)($user_data['notify_2_days_before'] ?? false),
+                'notify_1_day_before' => (bool)($user_data['notify_1_day_before'] ?? false),
+                'notify_on_due_date' => (bool)($user_data['notify_on_due_date'] ?? true),
+                'notify_1_day_after_due' => (bool)($user_data['notify_1_day_after_due'] ?? false),
+            ];
+
+            // 1. Clientes com vencimento em 5 dias (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_5_days_before']) {
                 $clients_5_days = $client->getClientsDueInDays($user_id, 5)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_5_days_before'] += count($clients_5_days);
                 
@@ -107,8 +117,8 @@ try {
                 }
             }
             
-            // 2. Clientes com vencimento em 3 dias (se habilitado)
-            if ($appSettings->isNotify3DaysBeforeEnabled()) {
+            // 2. Clientes com vencimento em 3 dias (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_3_days_before']) {
                 $clients_3_days = $client->getClientsDueInDays($user_id, 3)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_3_days_before'] += count($clients_3_days);
                 
@@ -129,8 +139,8 @@ try {
                 }
             }
             
-            // 3. Clientes com vencimento em 2 dias (se habilitado)
-            if ($appSettings->isNotify2DaysBeforeEnabled()) {
+            // 3. Clientes com vencimento em 2 dias (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_2_days_before']) {
                 $clients_2_days = $client->getClientsDueInDays($user_id, 2)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_2_days_before'] += count($clients_2_days);
                 
@@ -151,8 +161,8 @@ try {
                 }
             }
             
-            // 4. Clientes com vencimento em 1 dia (se habilitado)
-            if ($appSettings->isNotify1DayBeforeEnabled()) {
+            // 4. Clientes com vencimento em 1 dia (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_1_day_before']) {
                 $clients_1_day = $client->getClientsDueInDays($user_id, 1)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_1_day_before'] += count($clients_1_day);
                 
@@ -173,8 +183,8 @@ try {
                 }
             }
             
-            // 5. Clientes com vencimento hoje (se habilitado)
-            if ($appSettings->isNotifyOnDueDateEnabled()) {
+            // 5. Clientes com vencimento hoje (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_on_due_date']) {
                 $clients_today = $client->getClientsDueToday($user_id)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_due_today'] += count($clients_today);
                 
@@ -195,8 +205,8 @@ try {
                 }
             }
             
-            // 6. Clientes com 1 dia de atraso (se habilitado)
-            if ($appSettings->isNotify1DayAfterDueEnabled()) {
+            // 6. Clientes com 1 dia de atraso (se habilitado pelo usuário)
+            if ($user_notify_settings['notify_1_day_after_due']) {
                 $clients_1_day_overdue = $client->getClientsOverdueDays($user_id, 1)->fetchAll(PDO::FETCH_ASSOC);
                 $stats['clients_1_day_overdue'] += count($clients_1_day_overdue);
                 

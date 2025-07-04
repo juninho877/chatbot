@@ -14,6 +14,13 @@ class User {
     public $role;
     public $whatsapp_instance;
     public $whatsapp_connected;
+    // Novas propriedades para configurações de notificação
+    public $notify_5_days_before;
+    public $notify_3_days_before;
+    public $notify_2_days_before;
+    public $notify_1_day_before;
+    public $notify_on_due_date;
+    public $notify_1_day_after_due;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -21,7 +28,13 @@ class User {
 
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " 
-                  SET name=:name, email=:email, password=:password, phone=:phone, plan_id=:plan_id, role=:role";
+                  SET name=:name, email=:email, password=:password, phone=:phone, plan_id=:plan_id, role=:role,
+                      notify_5_days_before=:notify_5_days_before,
+                      notify_3_days_before=:notify_3_days_before,
+                      notify_2_days_before=:notify_2_days_before,
+                      notify_1_day_before=:notify_1_day_before,
+                      notify_on_due_date=:notify_on_due_date,
+                      notify_1_day_after_due=:notify_1_day_after_due";
         
         $stmt = $this->conn->prepare($query);
         
@@ -32,12 +45,26 @@ class User {
             $this->role = 'user';
         }
         
+        // Definir valores padrão para as novas colunas
+        $this->notify_5_days_before = $this->notify_5_days_before ?? false;
+        $this->notify_3_days_before = $this->notify_3_days_before ?? true;
+        $this->notify_2_days_before = $this->notify_2_days_before ?? false;
+        $this->notify_1_day_before = $this->notify_1_day_before ?? false;
+        $this->notify_on_due_date = $this->notify_on_due_date ?? true;
+        $this->notify_1_day_after_due = $this->notify_1_day_after_due ?? false;
+
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":phone", $this->phone);
         $stmt->bindParam(":plan_id", $this->plan_id);
         $stmt->bindParam(":role", $this->role);
+        $stmt->bindParam(":notify_5_days_before", $this->notify_5_days_before, PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_3_days_before", $this->notify_3_days_before, PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_2_days_before", $this->notify_2_days_before, PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_1_day_before", $this->notify_1_day_before, PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_on_due_date", $this->notify_on_due_date, PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_1_day_after_due", $this->notify_1_day_after_due, PDO::PARAM_BOOL);
         
         if($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
@@ -52,7 +79,9 @@ class User {
         error_log("Attempting login for email: " . $email);
         error_log("Provided password: " . $password);
         
-        $query = "SELECT id, name, email, password, plan_id, role, whatsapp_instance, whatsapp_connected 
+        $query = "SELECT id, name, email, password, plan_id, role, whatsapp_instance, whatsapp_connected,
+                         notify_5_days_before, notify_3_days_before, notify_2_days_before,
+                         notify_1_day_before, notify_on_due_date, notify_1_day_after_due
                   FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
         
         $stmt = $this->conn->prepare($query);
@@ -79,6 +108,14 @@ class User {
                 $this->role = $row['role'] ?? 'user'; // Fallback para compatibilidade
                 $this->whatsapp_instance = $row['whatsapp_instance'];
                 $this->whatsapp_connected = $row['whatsapp_connected'];
+                // Carregar configurações de notificação
+                $this->notify_5_days_before = (bool)($row['notify_5_days_before'] ?? false);
+                $this->notify_3_days_before = (bool)($row['notify_3_days_before'] ?? true);
+                $this->notify_2_days_before = (bool)($row['notify_2_days_before'] ?? false);
+                $this->notify_1_day_before = (bool)($row['notify_1_day_before'] ?? false);
+                $this->notify_on_due_date = (bool)($row['notify_on_due_date'] ?? true);
+                $this->notify_1_day_after_due = (bool)($row['notify_1_day_after_due'] ?? false);
+
                 error_log("Login successful for user ID: " . $this->id . ", Role: " . $this->role);
                 return true;
             } else {
@@ -98,7 +135,10 @@ class User {
     }
 
     public function readAll() {
-        $query = "SELECT id, name, email, plan_id, role, whatsapp_instance, whatsapp_connected 
+        // Modificado para incluir as novas colunas
+        $query = "SELECT id, name, email, plan_id, role, whatsapp_instance, whatsapp_connected,
+                         notify_5_days_before, notify_3_days_before, notify_2_days_before,
+                         notify_1_day_before, notify_on_due_date, notify_1_day_after_due
                   FROM " . $this->table_name . " 
                   WHERE whatsapp_instance IS NOT NULL AND whatsapp_connected = 1
                   ORDER BY id ASC";
@@ -170,6 +210,52 @@ class User {
             $name = 'user' . $this->id;
         }
         return 'cm_' . $name;
+    }
+
+    // Novo método para ler as configurações de notificação de um usuário
+    public function readNotificationSettings($user_id) {
+        $query = "SELECT notify_5_days_before, notify_3_days_before, notify_2_days_before,
+                         notify_1_day_before, notify_on_due_date, notify_1_day_after_due
+                  FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $user_id);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return [
+                'notify_5_days_before' => (bool)$row['notify_5_days_before'],
+                'notify_3_days_before' => (bool)$row['notify_3_days_before'],
+                'notify_2_days_before' => (bool)$row['notify_2_days_before'],
+                'notify_1_day_before' => (bool)$row['notify_1_day_before'],
+                'notify_on_due_date' => (bool)$row['notify_on_due_date'],
+                'notify_1_day_after_due' => (bool)$row['notify_1_day_after_due']
+            ];
+        }
+        return null;
+    }
+
+    // Novo método para atualizar as configurações de notificação de um usuário
+    public function updateNotificationSettings($user_id, $settings) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET notify_5_days_before = :notify_5_days_before,
+                      notify_3_days_before = :notify_3_days_before,
+                      notify_2_days_before = :notify_2_days_before,
+                      notify_1_day_before = :notify_1_day_before,
+                      notify_on_due_date = :notify_on_due_date,
+                      notify_1_day_after_due = :notify_1_day_after_due
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":notify_5_days_before", $settings['notify_5_days_before'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_3_days_before", $settings['notify_3_days_before'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_2_days_before", $settings['notify_2_days_before'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_1_day_before", $settings['notify_1_day_before'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_on_due_date", $settings['notify_on_due_date'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":notify_1_day_after_due", $settings['notify_1_day_after_due'], PDO::PARAM_BOOL);
+        $stmt->bindParam(":id", $user_id);
+        
+        return $stmt->execute();
     }
 }
 ?>

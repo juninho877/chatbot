@@ -44,9 +44,10 @@ $subscription_info = $current_user->getSubscriptionInfo();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -54,7 +55,7 @@ $subscription_info = $current_user->getSubscriptionInfo();
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Dashboard</h1>
                     </div>
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         
@@ -102,7 +103,7 @@ $subscription_info = $current_user->getSubscriptionInfo();
                         <!-- Stats -->
                         <div class="mt-8">
                             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
+                                <div class="dashboard-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -110,15 +111,15 @@ $subscription_info = $current_user->getSubscriptionInfo();
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Total de Clientes</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $total_clients; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Total de Clientes</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $total_clients; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
+                                <div class="dashboard-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -126,15 +127,15 @@ $subscription_info = $current_user->getSubscriptionInfo();
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Clientes Ativos</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $active_clients; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Clientes Ativos</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $active_clients; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
+                                <div class="dashboard-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -142,15 +143,15 @@ $subscription_info = $current_user->getSubscriptionInfo();
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Mensagens Hoje</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $messages_today; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Mensagens Hoje</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $messages_today; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
+                                <div class="dashboard-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 p-4">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -158,8 +159,8 @@ $subscription_info = $current_user->getSubscriptionInfo();
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">WhatsApp</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900">
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">WhatsApp</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100">
                                                         <?php echo $_SESSION['whatsapp_connected'] ? 'Conectado' : 'Desconectado'; ?>
                                                     </dd>
                                                 </dl>
@@ -172,34 +173,34 @@ $subscription_info = $current_user->getSubscriptionInfo();
 
                         <!-- Quick Actions -->
                         <div class="mt-8">
-                            <h2 class="text-lg font-medium text-gray-900 mb-4 px-2">Ações Rápidas</h2>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4 px-2">Ações Rápidas</h2>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 px-2">
-                                <a href="clients.php?action=add" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <a href="clients.php?action=add" class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                                     <div class="flex items-center">
                                         <i class="fas fa-user-plus text-blue-500 text-3xl mr-4"></i>
                                         <div>
-                                            <h3 class="font-semibold text-gray-900">Adicionar Cliente</h3>
-                                            <p class="text-base text-gray-500">Cadastrar novo cliente</p>
+                                            <h3 class="font-semibold text-gray-900 dark:text-slate-100">Adicionar Cliente</h3>
+                                            <p class="text-base text-gray-500 dark:text-slate-400">Cadastrar novo cliente</p>
                                         </div>
                                     </div>
                                 </a>
 
-                                <a href="messages.php?action=send" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <a href="messages.php?action=send" class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                                     <div class="flex items-center">
                                         <i class="fab fa-whatsapp text-green-500 text-3xl mr-4"></i>
                                         <div>
-                                            <h3 class="font-semibold text-gray-900">Enviar Mensagem</h3>
-                                            <p class="text-base text-gray-500">Enviar mensagem via WhatsApp</p>
+                                            <h3 class="font-semibold text-gray-900 dark:text-slate-100">Enviar Mensagem</h3>
+                                            <p class="text-base text-gray-500 dark:text-slate-400">Enviar mensagem via WhatsApp</p>
                                         </div>
                                     </div>
                                 </a>
 
-                                <a href="templates.php?action=add" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <a href="templates.php?action=add" class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                                     <div class="flex items-center">
                                         <i class="fas fa-plus text-purple-500 text-3xl mr-4"></i>
                                         <div>
-                                            <h3 class="font-semibold text-gray-900">Criar Template</h3>
-                                            <p class="text-base text-gray-500">Novo template de mensagem</p>
+                                            <h3 class="font-semibold text-gray-900 dark:text-slate-100">Criar Template</h3>
+                                            <p class="text-base text-gray-500 dark:text-slate-400">Novo template de mensagem</p>
                                         </div>
                                     </div>
                                 </a>

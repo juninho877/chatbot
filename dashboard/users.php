@@ -274,9 +274,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -286,8 +287,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Gerenciar Usuários</h1>
-                                <p class="mt-1 text-sm text-gray-600">Administre todos os usuários do sistema e suas assinaturas</p>
+                                <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Gerenciar Usuários</h1>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">Administre todos os usuários do sistema e suas assinaturas</p>
                             </div>
                             <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md hover:shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
@@ -317,50 +318,50 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <?php endif; ?>
 
                         <!-- Lista de Usuários -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-600">
+                                        <thead class="bg-gray-50 dark:bg-slate-700">
                                             <tr>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Usuário</th>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Plano</th>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status Assinatura</th>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Expiração Plano</th>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">WhatsApp</th>
-                                                <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Usuário</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Plano</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Status Assinatura</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Expiração Plano</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">WhatsApp</th>
+                                                <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Ações</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
+                                        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
                                             <?php foreach ($users as $user_row): ?>
-                                            <tr class="hover:bg-gray-50">
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700">
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="flex items-center">
                                                         <div class="flex-shrink-0 h-10 w-10">
-                                                            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                                                <i class="fas fa-user text-gray-600"></i>
+                                                            <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center">
+                                                                <i class="fas fa-user text-gray-600 dark:text-slate-300"></i>
                                                             </div>
                                                         </div>
                                                         <div class="ml-4">
-                                                            <div class="text-sm font-medium text-gray-900">
+                                                            <div class="text-sm font-medium text-gray-900 dark:text-slate-100">
                                                                 <?php echo htmlspecialchars($user_row['name']); ?>
                                                                 <?php if ($user_row['role'] === 'admin'): ?>
                                                                     <span class="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Admin</span>
                                                                 <?php endif; ?>
                                                             </div>
-                                                            <div class="text-sm text-gray-500"><?php echo htmlspecialchars($user_row['email']); ?></div>
+                                                            <div class="text-sm text-gray-500 dark:text-slate-400"><?php echo htmlspecialchars($user_row['email']); ?></div>
                                                             <?php if ($user_row['phone']): ?>
-                                                                <div class="text-xs text-gray-400"><?php echo htmlspecialchars($user_row['phone']); ?></div>
+                                                                <div class="text-xs text-gray-400 dark:text-slate-500"><?php echo htmlspecialchars($user_row['phone']); ?></div>
                                                             <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm text-gray-900">
+                                                    <div class="text-sm text-gray-900 dark:text-slate-100">
                                                         <?php echo htmlspecialchars($user_row['plan_name'] ?? 'Sem plano'); ?>
                                                     </div>
                                                     <?php if ($user_row['plan_price']): ?>
-                                                        <div class="text-sm text-gray-500">R$ <?php echo number_format($user_row['plan_price'], 2, ',', '.'); ?>/mês</div>
+                                                        <div class="text-sm text-gray-500 dark:text-slate-400">R$ <?php echo number_format($user_row['plan_price'], 2, ',', '.'); ?>/mês</div>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -386,19 +387,19 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <?php if ($user_row['role'] === 'admin'): ?>
-                                                        <span class="text-sm text-green-600 font-medium">Sem expiração</span>
+                                                        <span class="text-sm text-green-600 dark:text-green-400 font-medium">Sem expiração</span>
                                                     <?php elseif ($status === 'trial' && $user_row['trial_ends_at']): ?>
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-900 dark:text-slate-100">
                                                             <?php echo date('d/m/Y H:i', strtotime($user_row['trial_ends_at'])); ?>
                                                         </div>
-                                                        <div class="text-xs text-yellow-600">Teste expira</div>
+                                                        <div class="text-xs text-yellow-600 dark:text-yellow-400">Teste expira</div>
                                                     <?php elseif ($user_row['plan_expires_at']): ?>
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-900 dark:text-slate-100">
                                                             <?php echo date('d/m/Y H:i', strtotime($user_row['plan_expires_at'])); ?>
                                                         </div>
-                                                        <div class="text-xs text-gray-500">Plano expira</div>
+                                                        <div class="text-xs text-gray-500 dark:text-slate-400">Plano expira</div>
                                                     <?php else: ?>
-                                                        <span class="text-sm text-gray-400">Não definido</span>
+                                                        <span class="text-sm text-gray-400 dark:text-slate-500">Não definido</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -457,37 +458,37 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </div>
 
     <!-- Modal para adicionar/editar usuário -->
-    <div id="userModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-blue-600">
+    <div id="userModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-blue-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modalTitle">Adicionar Usuário</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4" id="modalTitle">Adicionar Usuário</h3>
                 <form id="userForm" method="POST">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="userId">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nome *</label>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome *</label>
                             <input type="text" name="name" id="name" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                         </div>
                         
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email *</label>
+                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Email *</label>
                             <input type="email" name="email" id="email" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                         </div>
                         
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone</label>
                             <input type="tel" name="phone" id="phone" 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                         </div>
                         
                         <div>
-                            <label for="plan_id" class="block text-sm font-medium text-gray-700">Plano *</label>
+                            <label for="plan_id" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Plano *</label>
                             <select name="plan_id" id="plan_id" required 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                 <option value="">Selecione um plano</option>
                                 <?php foreach ($plans as $plan_row): ?>
                                     <option value="<?php echo $plan_row['id']; ?>">
@@ -498,25 +499,25 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         </div>
                         
                         <div>
-                            <label for="role" class="block text-sm font-medium text-gray-700">Papel *</label>
+                            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Papel *</label>
                             <select name="role" id="role" required 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                 <option value="user">Usuário</option>
                                 <option value="admin">Administrador</option>
                             </select>
                         </div>
                         
                         <div id="passwordField">
-                            <label for="password" class="block text-sm font-medium text-gray-700">Senha *</label>
+                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Senha *</label>
                             <input type="password" name="password" id="password" 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                    minlength="6">
-                            <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres</p>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Mínimo 6 caracteres</p>
                         </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">

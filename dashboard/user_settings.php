@@ -199,10 +199,11 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -210,7 +211,7 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-3xl font-bold text-gray-900">Minhas Configurações</h1>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Minhas Configurações</h1>
                     </div>
                     
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -252,21 +253,21 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                         <?php endif; ?>
 
                         <!-- Configurações de Notificação -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Configurações de Notificação Automática</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Configurações de Notificação Automática</h3>
                                 
                                 <form method="POST" class="space-y-6">
                                     <input type="hidden" name="action" value="update_notification_settings">
                                     
-                                    <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
                                         <div class="flex">
                                             <div class="flex-shrink-0">
                                                 <i class="fas fa-info-circle text-blue-500"></i>
                                             </div>
                                             <div class="ml-3">
-                                                <h4 class="text-sm font-medium text-blue-800">Como funciona a automação</h4>
-                                                <p class="text-sm text-blue-700 mt-1">
+                                                <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300">Como funciona a automação</h4>
+                                                <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
                                                     Selecione abaixo quando você deseja que o sistema envie mensagens automáticas para seus clientes.
                                                     Para cada período ativo, você precisa ter um template correspondente.
                                                 </p>
@@ -276,7 +277,7 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                     
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div class="space-y-4">
-                                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Períodos de Notificação</h4>
+                                            <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 border-b dark:border-slate-600 pb-2">Períodos de Notificação</h4>
                                             
                                             <div class="flex items-start">
                                                 <div class="flex items-center h-5">
@@ -285,13 +286,13 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_5_days_before" class="font-medium text-gray-700 <?php echo ($template_types['due_5_days_before'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_5_days_before" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['due_5_days_before'] ? '' : 'text-opacity-50'); ?>">
                                                         5 dias antes do vencimento
                                                         <?php if (!$template_types['due_5_days_before']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Aviso antecipado para o cliente se organizar</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Aviso antecipado para o cliente se organizar</p>
                                                 </div>
                                             </div>
                                             
@@ -302,13 +303,13 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_3_days_before" class="font-medium text-gray-700 <?php echo ($template_types['due_3_days_before'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_3_days_before" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['due_3_days_before'] ? '' : 'text-opacity-50'); ?>">
                                                         3 dias antes do vencimento
                                                         <?php if (!$template_types['due_3_days_before']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete padrão recomendado</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete padrão recomendado</p>
                                                 </div>
                                             </div>
                                             
@@ -319,19 +320,19 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_2_days_before" class="font-medium text-gray-700 <?php echo ($template_types['due_2_days_before'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_2_days_before" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['due_2_days_before'] ? '' : 'text-opacity-50'); ?>">
                                                         2 dias antes do vencimento
                                                         <?php if (!$template_types['due_2_days_before']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete mais próximo do vencimento</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete mais próximo do vencimento</p>
                                                 </div>
                                             </div>
                                         </div>
                                         
                                         <div class="space-y-4">
-                                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Mais Períodos</h4>
+                                            <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 border-b dark:border-slate-600 pb-2">Mais Períodos</h4>
                                             
                                             <div class="flex items-start">
                                                 <div class="flex items-center h-5">
@@ -340,13 +341,13 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_1_day_before" class="font-medium text-gray-700 <?php echo ($template_types['due_1_day_before'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_1_day_before" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['due_1_day_before'] ? '' : 'text-opacity-50'); ?>">
                                                         1 dia antes do vencimento
                                                         <?php if (!$template_types['due_1_day_before']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Último lembrete antes do vencimento</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Último lembrete antes do vencimento</p>
                                                 </div>
                                             </div>
                                             
@@ -357,13 +358,13 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_on_due_date" class="font-medium text-gray-700 <?php echo ($template_types['due_today'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_on_due_date" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['due_today'] ? '' : 'text-opacity-50'); ?>">
                                                         No dia do vencimento
                                                         <?php if (!$template_types['due_today']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete no dia que vence</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete no dia que vence</p>
                                                 </div>
                                             </div>
                                             
@@ -374,19 +375,19 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_1_day_after_due" class="font-medium text-gray-700 <?php echo ($template_types['overdue_1_day'] ? '' : 'text-opacity-50'); ?>">
+                                                    <label for="notify_1_day_after_due" class="font-medium text-gray-700 dark:text-slate-300 <?php echo ($template_types['overdue_1_day'] ? '' : 'text-opacity-50'); ?>">
                                                         1 dia após o vencimento
                                                         <?php if (!$template_types['overdue_1_day']): ?>
                                                             <span class="text-yellow-600 text-xs">(Template não encontrado)</span>
                                                         <?php endif; ?>
                                                     </label>
-                                                    <p class="text-gray-500">Cobrança para pagamentos em atraso</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Cobrança para pagamentos em atraso</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="flex justify-between items-center pt-4 border-t">
+                                    <div class="flex justify-between items-center pt-4 border-t dark:border-slate-600">
                                         <div>
                                             <?php
                                             // Verificar se há templates faltando
@@ -410,7 +411,17 @@ $whatsapp_connected = $_SESSION['whatsapp_connected'] ?? false;
                                         </div>
                                         
                                             <i class="fas fa-save mr-2"></i>
-        <?php include 'sidebar.php'; ?>
+                                            <i class="fas fa-save mr-2"></i>
+                                            Salvar Configurações
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>

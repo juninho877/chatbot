@@ -11,38 +11,7 @@ require_once 'config/database.php';
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Estilos para o menu mobile */
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 50;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .mobile-menu.open {
-            display: flex;
-        }
-        
-        .mobile-menu a {
-            color: white;
-            font-size: 1.25rem;
-            padding: 1rem;
-            width: 100%;
-            text-align: center;
-        }
-        
-        .mobile-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-    </style>
+    <link href="dashboard/css/responsive.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
     <!-- Header -->

@@ -272,9 +272,10 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -283,7 +284,7 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex justify-between items-center">
-                            <h1 class="text-3xl font-bold text-gray-900">Mensagens WhatsApp</h1>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Mensagens WhatsApp</h1>
                             <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
                                 <button onclick="openSendModal()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-md hover:shadow-lg">
                                     <i class="fab fa-whatsapp mr-2"></i>
@@ -320,7 +321,7 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                         <!-- Estatísticas -->
                         <div class="mt-8">
                             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="stats-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -328,15 +329,15 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Total Enviadas</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $stats['total_messages'] ?? 0; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Total Enviadas</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $stats['total_messages'] ?? 0; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="stats-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -344,15 +345,15 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Hoje</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $stats['today_count'] ?? 0; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Hoje</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $stats['today_count'] ?? 0; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="stats-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -360,15 +361,15 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Entregues</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $stats['delivered_count'] ?? 0; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Entregues</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $stats['delivered_count'] ?? 0; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                                <div class="stats-card bg-white dark:bg-slate-800 overflow-hidden shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                                     <div class="p-6">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -376,8 +377,8 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                             </div>
                                             <div class="ml-5 w-0 flex-1">
                                                 <dl>
-                                                    <dt class="text-base font-medium text-gray-600 truncate">Falharam</dt>
-                                                    <dd class="text-xl font-semibold text-gray-900"><?php echo $stats['failed_count'] ?? 0; ?></dd>
+                                                    <dt class="text-base font-medium text-gray-600 dark:text-slate-400 truncate">Falharam</dt>
+                                                    <dd class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo $stats['failed_count'] ?? 0; ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
@@ -387,15 +388,15 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                         </div>
 
                         <!-- Histórico de Mensagens -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Histórico de Mensagens</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Histórico de Mensagens</h3>
                                 
                                 <?php if (empty($history)): ?>
                                     <div class="text-center py-12">
                                         <i class="fab fa-whatsapp text-gray-300 text-7xl mb-4"></i>
-                                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhuma mensagem enviada</h3>
-                                        <p class="text-lg text-gray-500 mb-4">Comece enviando sua primeira mensagem</p>
+                                        <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Nenhuma mensagem enviada</h3>
+                                        <p class="text-lg text-gray-500 dark:text-slate-400 mb-4">Comece enviando sua primeira mensagem</p>
                                         <button onclick="openSendModal()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
                                             <i class="fab fa-whatsapp mr-2"></i>
                                             Enviar Primeira Mensagem
@@ -403,32 +404,32 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                     </div>
                                 <?php else: ?>
                                     <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
+                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-600">
+                                            <thead class="bg-gray-50 dark:bg-slate-700">
                                                 <tr>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Mensagem</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Template</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Enviado em</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Cliente</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Mensagem</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Template</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Enviado em</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
                                                 <?php foreach ($history as $msg): ?>
-                                                <tr class="hover:bg-gray-50">
+                                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-700">
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div>
-                                                            <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($msg['client_name'] ?? 'Cliente removido'); ?></div>
-                                                            <div class="text-sm text-gray-500"><?php echo htmlspecialchars($msg['phone']); ?></div>
+                                                            <div class="text-sm font-medium text-gray-900 dark:text-slate-100"><?php echo htmlspecialchars($msg['client_name'] ?? 'Cliente removido'); ?></div>
+                                                            <div class="text-sm text-gray-500 dark:text-slate-400"><?php echo htmlspecialchars($msg['phone']); ?></div>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="text-sm text-gray-900 max-w-xs truncate" title="<?php echo htmlspecialchars($msg['message']); ?>">
+                                                        <div class="text-sm text-gray-900 dark:text-slate-100 max-w-xs truncate" title="<?php echo htmlspecialchars($msg['message']); ?>">
                                                             <?php echo htmlspecialchars(substr($msg['message'], 0, 50)) . (strlen($msg['message']) > 50 ? '...' : ''); ?>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-900 dark:text-slate-100">
                                                             <?php echo $msg['template_name'] ? htmlspecialchars($msg['template_name']) : 'Mensagem personalizada'; ?>
                                                         </div>
                                                     </td>
@@ -443,7 +444,7 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                                             <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-200 text-red-800">Falhou</span>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                                                         <?php echo date('d/m/Y H:i', strtotime($msg['sent_at'])); ?>
                                                     </td>
                                                 </tr>
@@ -461,18 +462,18 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
     </div>
 
     <!-- Modal para enviar mensagem individual -->
-    <div id="sendModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-green-600">
+    <div id="sendModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-green-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4">Enviar Mensagem</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Enviar Mensagem</h3>
                 <form method="POST">
                     <input type="hidden" name="action" value="send_message">
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="client_id" class="block text-sm font-medium text-gray-700">Cliente *</label>
+                            <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Cliente *</label>
                             <select name="client_id" id="client_id" required 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5">
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                 <option value="">Selecione um cliente</option>
                                 <?php foreach ($clients as $client_row): ?>
                                     <option value="<?php echo $client_row['id']; ?>">
@@ -483,9 +484,9 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                         </div>
                         
                         <div>
-                            <label for="template_id" class="block text-sm font-medium text-gray-700">Template (opcional)</label>
+                            <label for="template_id" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Template (opcional)</label>
                             <select name="template_id" id="template_id" 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5"
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                     onchange="loadTemplate()">
                                 <option value="">Selecione um template ou digite mensagem personalizada</option>
                                 <?php foreach ($templates as $template_row): ?>
@@ -497,18 +498,18 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                         </div>
                         
                         <div>
-                            <label for="custom_message" class="block text-sm font-medium text-gray-700">Mensagem *</label>
+                            <label for="custom_message" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Mensagem *</label>
                             <textarea name="custom_message" id="custom_message" rows="4" required
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5"
+                                      class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                       placeholder="Digite sua mensagem aqui..."></textarea>
-                            <p class="mt-1 text-xs text-gray-500">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">
                                 Variáveis disponíveis: {nome}, {valor}, {vencimento}
                             </p>
                         </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeSendModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeSendModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
@@ -522,18 +523,18 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
     </div>
 
     <!-- Modal para envio em lote -->
-    <div id="bulkModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-4xl shadow-lg rounded-md bg-white border-t-4 border-blue-600">
+    <div id="bulkModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-4xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-blue-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4">Envio em Lote</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Envio em Lote</h3>
                 <form method="POST">
                     <input type="hidden" name="action" value="send_bulk">
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="bulk_template_id" class="block text-sm font-medium text-gray-700">Template *</label>
+                            <label for="bulk_template_id" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Template *</label>
                             <select name="bulk_template_id" id="bulk_template_id" required 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                 <option value="">Selecione um template</option>
                                 <?php foreach ($templates as $template_row): ?>
                                     <option value="<?php echo $template_row['id']; ?>">
@@ -544,12 +545,12 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Clientes *</label>
-                            <div class="max-h-60 overflow-y-auto border border-gray-300 rounded-md p-3">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Selecionar Clientes *</label>
+                            <div class="max-h-60 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-md p-3 bg-white dark:bg-slate-700">
                                 <div class="mb-2">
                                     <label class="inline-flex items-center">
                                         <input type="checkbox" id="select_all" class="form-checkbox h-4 w-4 text-blue-600">
-                                        <span class="ml-2 text-sm font-medium text-gray-700">Selecionar todos</span>
+                                        <span class="ml-2 text-sm font-medium text-gray-700 dark:text-slate-300">Selecionar todos</span>
                                     </label>
                                 </div>
                                 <div class="space-y-2">
@@ -557,10 +558,10 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                                         <label class="inline-flex items-center w-full">
                                             <input type="checkbox" name="selected_clients[]" value="<?php echo $client_row['id']; ?>" 
                                                    class="form-checkbox h-4 w-4 text-blue-600 client-checkbox">
-                                            <span class="ml-2 text-sm text-gray-700">
+                                            <span class="ml-2 text-sm text-gray-700 dark:text-slate-300">
                                                 <?php echo htmlspecialchars($client_row['name']) . ' - ' . htmlspecialchars($client_row['phone']); ?>
                                                 <?php if ($client_row['subscription_amount']): ?>
-                                                    <span class="text-gray-500">(R$ <?php echo number_format($client_row['subscription_amount'], 2, ',', '.'); ?>)</span>
+                                                    <span class="text-gray-500 dark:text-slate-400">(R$ <?php echo number_format($client_row['subscription_amount'], 2, ',', '.'); ?>)</span>
                                                 <?php endif; ?>
                                             </span>
                                         </label>
@@ -571,7 +572,7 @@ $stats = $messageHistory->getStatistics($_SESSION['user_id']);
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeBulkModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeBulkModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">

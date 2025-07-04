@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../classes/AppSettings.php';
+require_once __DIR__ . '/../classes/AppSettings.php';
 
 // Verificar se está logado
 if (!isset($_SESSION['user_id'])) {
@@ -40,17 +41,6 @@ $appSettings = new AppSettings($db);
 
 $message = '';
 $error = '';
-
-// Verificar se há mensagens na sessão (vindas de redirect)
-if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
-    unset($_SESSION['message']); // Limpar da sessão após usar
-}
-
-if (isset($_SESSION['error'])) {
-    $error = $_SESSION['error'];
-    unset($_SESSION['error']); // Limpar da sessão após usar
-}
 
 // Verificar se há mensagens na sessão (vindas de redirect)
 if (isset($_SESSION['message'])) {
@@ -142,13 +132,11 @@ if ($_POST) {
                         if (!in_array($file_type, $allowed_types) && !$file_info) {
                             $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
                             redirect("settings.php");
-                            redirect("settings.php");
                         }
                         
                         // Validar tamanho (máximo 1MB)
                         if ($favicon_file['size'] > 1024 * 1024) {
                             $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
-                            redirect("settings.php");
                             redirect("settings.php");
                         }
                         
@@ -183,7 +171,6 @@ if ($_POST) {
                         } else {
                             $_SESSION['error'] = "Erro ao fazer upload do favicon.";
                             redirect("settings.php");
-                            redirect("settings.php");
                         }
                     }
                     
@@ -191,20 +178,18 @@ if ($_POST) {
                         $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
                         if (isset($favicon_message)) {
                             $success_message .= $favicon_message;
+                        }
                         $_SESSION['message'] = $success_message;
                         
                         // Atualizar timezone se foi alterado
                         if (isset($_POST['timezone'])) {
                             date_default_timezone_set($_POST['timezone']);
                         }
-                        } else {
-                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
                         }
-                        
-                    // Redirecionar para evitar reenvio
-                    redirect("settings.php");
-                        $_SESSION['message'] = $success_message;
-                        
+                    } else {
+                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
+                    }
+                    
                     // Redirecionar para evitar reenvio
                     redirect("settings.php");
                     break;
@@ -212,7 +197,6 @@ if ($_POST) {
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Erro: " . $e->getMessage();
-        redirect("settings.php");
         redirect("settings.php");
     }
 }
@@ -244,10 +228,11 @@ $timezones = [
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -256,8 +241,8 @@ $timezones = [
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex items-center justify-between">
-                            <h1 class="text-3xl font-bold text-gray-900">Configurações do Sistema</h1>
-                            <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Configurações do Sistema</h1>
+                            <div class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-3 py-1 rounded-full text-sm font-medium">
                                 <i class="fas fa-shield-alt mr-1"></i>
                                 Acesso Administrativo
                             </div>
@@ -285,13 +270,13 @@ $timezones = [
                         <?php endif; ?>
 
                         <!-- Alerta de Segurança -->
-                        <div class="mt-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
+                        <div class="mt-8 bg-yellow-100 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <i class="fas fa-exclamation-triangle text-yellow-600"></i>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-sm text-yellow-800">
+                                    <p class="text-sm text-yellow-800 dark:text-yellow-300">
                                         <strong>Área Restrita:</strong> Esta página contém configurações críticas do sistema. 
                                         Apenas administradores autorizados devem fazer alterações aqui.
                                     </p>
@@ -300,9 +285,9 @@ $timezones = [
                         </div>
 
                         <!-- Formulário de Configurações -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-6">Configurações Gerais</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-6">Configurações Gerais</h3>
                                 
                                 <form method="POST" enctype="multipart/form-data" class="space-y-6">
                                     <input type="hidden" name="action" value="update_settings">
@@ -310,25 +295,25 @@ $timezones = [
                                     <!-- Configurações Básicas -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label for="site_name" class="block text-sm font-medium text-gray-700">Nome do Site</label>
+                                            <label for="site_name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome do Site</label>
                                             <input type="text" name="site_name" id="site_name" 
                                                    value="<?php echo htmlspecialchars($all_settings['site_name']['value'] ?? ''); ?>"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                            <p class="mt-1 text-xs text-gray-500">Nome exibido no sistema e nos emails</p>
+                                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Nome exibido no sistema e nos emails</p>
                                         </div>
                                         
                                         <div>
-                                            <label for="admin_email" class="block text-sm font-medium text-gray-700">Email do Administrador</label>
+                                            <label for="admin_email" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Email do Administrador</label>
                                             <input type="email" name="admin_email" id="admin_email" required
                                                    value="<?php echo htmlspecialchars($all_settings['admin_email']['value'] ?? ''); ?>"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                            <p class="mt-1 text-xs text-gray-500">Email para receber relatórios e notificações</p>
+                                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Email para receber relatórios e notificações</p>
                                         </div>
                                         
                                         <div>
-                                            <label for="timezone" class="block text-sm font-medium text-gray-700">Fuso Horário</label>
+                                            <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Fuso Horário</label>
                                             <select name="timezone" id="timezone" 
-                                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                                 <?php foreach ($timezones as $tz => $label): ?>
                                                     <option value="<?php echo $tz; ?>" 
                                                             <?php echo ($all_settings['timezone']['value'] ?? '') === $tz ? 'selected' : ''; ?>>
@@ -339,41 +324,41 @@ $timezones = [
                                         </div>
                                         
                                         <div>
-                                            <label for="favicon" class="block text-sm font-medium text-gray-700">Favicon do Site</label>
+                                            <label for="favicon" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Favicon do Site</label>
                                             <input type="file" name="favicon" id="favicon" accept=".ico,.png,.jpg,.jpeg,.gif"
-                                                   class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                            <p class="mt-1 text-xs text-gray-500">Formatos: ICO, PNG, JPG, GIF (máx. 1MB)</p>
+                                                   class="mt-1 block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-800/30">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Formatos: ICO, PNG, JPG, GIF (máx. 1MB)</p>
                                             <?php if (!empty($all_settings['favicon_path']['value'])): ?>
                                                 <div class="mt-2 flex items-center">
                                                     <img src="<?php echo htmlspecialchars($all_settings['favicon_path']['value']); ?>" 
                                                          alt="Favicon atual" class="w-4 h-4 mr-2">
-                                                    <span class="text-xs text-gray-600">Favicon atual</span>
+                                                    <span class="text-xs text-gray-600 dark:text-slate-400">Favicon atual</span>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
                                         
                                         <div>
-                                            <label for="whatsapp_delay_seconds" class="block text-sm font-medium text-gray-700">Delay entre Mensagens (segundos)</label>
+                                            <label for="whatsapp_delay_seconds" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Delay entre Mensagens (segundos)</label>
                                             <input type="number" name="whatsapp_delay_seconds" id="whatsapp_delay_seconds" 
                                                    min="1" max="60" 
                                                    value="<?php echo htmlspecialchars($all_settings['whatsapp_delay_seconds']['value'] ?? '2'); ?>"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                            <p class="mt-1 text-xs text-gray-500">Tempo de espera entre envios para evitar spam</p>
+                                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Tempo de espera entre envios para evitar spam</p>
                                         </div>
                                         
                                         <div>
-                                            <label for="max_retry_attempts" class="block text-sm font-medium text-gray-700">Máximo de Tentativas</label>
+                                            <label for="max_retry_attempts" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Máximo de Tentativas</label>
                                             <input type="number" name="max_retry_attempts" id="max_retry_attempts" 
                                                    min="1" max="10" 
                                                    value="<?php echo htmlspecialchars($all_settings['max_retry_attempts']['value'] ?? '3'); ?>"
-                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                            <p class="mt-1 text-xs text-gray-500">Tentativas de reenvio para mensagens falhadas</p>
+                                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Tentativas de reenvio para mensagens falhadas</p>
                                         </div>
                                     </div>
                                     
                                     <!-- Configurações de Funcionalidades -->
-                                    <div class="border-t pt-6">
-                                        <h4 class="text-lg font-medium text-gray-900 mb-4">Funcionalidades</h4>
+                                    <div class="border-t dark:border-slate-600 pt-6">
+                                        <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Funcionalidades</h4>
                                         <div class="space-y-4">
                                             <div class="flex items-start">
                                                 <div class="flex items-center h-5">
@@ -382,10 +367,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="auto_billing_enabled" class="font-medium text-gray-700">
+                                                    <label for="auto_billing_enabled" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Cobrança Automática Ativa
                                                     </label>
-                                                    <p class="text-gray-500">
+                                                    <p class="text-gray-500 dark:text-slate-400">
                                                         Quando ativada, o sistema enviará mensagens automáticas de cobrança via cron job para clientes com vencimento próximo ou em atraso.
                                                     </p>
                                                 </div>
@@ -394,9 +379,9 @@ $timezones = [
                                     </div>
 
                                     <!-- Configurações de Períodos de Notificação -->
-                                    <div class="border-t pt-6">
-                                        <h4 class="text-lg font-medium text-gray-900 mb-4">Períodos de Notificação</h4>
-                                        <p class="text-sm text-gray-600 mb-4">
+                                    <div class="border-t dark:border-slate-600 pt-6">
+                                        <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Períodos de Notificação</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-4">
                                             Configure quando o sistema deve enviar avisos automáticos para seus clientes:
                                         </p>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -407,10 +392,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_5_days_before" class="font-medium text-gray-700">
+                                                    <label for="notify_5_days_before" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso 5 dias antes
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete antecipado para o cliente se organizar</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete antecipado para o cliente se organizar</p>
                                                 </div>
                                             </div>
 
@@ -421,10 +406,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_3_days_before" class="font-medium text-gray-700">
+                                                    <label for="notify_3_days_before" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso 3 dias antes
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete padrão recomendado</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete padrão recomendado</p>
                                                 </div>
                                             </div>
 
@@ -435,10 +420,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_2_days_before" class="font-medium text-gray-700">
+                                                    <label for="notify_2_days_before" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso 2 dias antes
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete mais próximo do vencimento</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete mais próximo do vencimento</p>
                                                 </div>
                                             </div>
 
@@ -449,10 +434,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_1_day_before" class="font-medium text-gray-700">
+                                                    <label for="notify_1_day_before" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso 1 dia antes
                                                     </label>
-                                                    <p class="text-gray-500">Último lembrete antes do vencimento</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Último lembrete antes do vencimento</p>
                                                 </div>
                                             </div>
 
@@ -463,10 +448,10 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_on_due_date" class="font-medium text-gray-700">
+                                                    <label for="notify_on_due_date" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso no dia do vencimento
                                                     </label>
-                                                    <p class="text-gray-500">Lembrete no dia que vence</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Lembrete no dia que vence</p>
                                                 </div>
                                             </div>
 
@@ -477,16 +462,16 @@ $timezones = [
                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                                 </div>
                                                 <div class="ml-3 text-sm">
-                                                    <label for="notify_1_day_after_due" class="font-medium text-gray-700">
+                                                    <label for="notify_1_day_after_due" class="font-medium text-gray-700 dark:text-slate-300">
                                                         Enviar aviso 1 dia após vencimento
                                                     </label>
-                                                    <p class="text-gray-500">Cobrança para pagamentos em atraso</p>
+                                                    <p class="text-gray-500 dark:text-slate-400">Cobrança para pagamentos em atraso</p>
                                                 </div>
                                             </div>
                                         </div>
                                         
-                                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-                                            <p class="text-sm text-blue-800">
+                                        <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                            <p class="text-sm text-blue-800 dark:text-blue-300">
                                                 <i class="fas fa-info-circle mr-2"></i>
                                                 <strong>Dica:</strong> Recomendamos ativar pelo menos "3 dias antes" e "no dia do vencimento" para uma cobrança eficiente. 
                                                 Evite ativar muitos períodos para não incomodar os clientes.
@@ -542,7 +527,61 @@ $timezones = [
                                     
                                     <div>
                                         <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
-        <?php include 'sidebar.php'; ?>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Informações do Sistema -->
+                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                            <div class="px-6 py-6 sm:p-8">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Informações do Sistema</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <strong>Última Execução do Cron:</strong><br>
+                                        <span class="text-gray-600"><?php echo htmlspecialchars($appSettings->getCronLastRun()); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Timezone Atual:</strong><br>
+                                        <span class="text-gray-600"><?php echo date_default_timezone_get(); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Data/Hora Atual:</strong><br>
+                                        <span class="text-gray-600"><?php echo date('d/m/Y H:i:s'); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Versão do PHP:</strong><br>
+                                        <span class="text-gray-600"><?php echo phpversion(); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Usuário Logado:</strong><br>
+                                        <span class="text-gray-600"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Nível de Acesso:</strong><br>
+                                        <span class="text-red-600 font-medium">Administrador</span>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong>Cobrança Automática:</strong><br>
+                                        <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
+                                            <?php echo $appSettings->isAutoBillingEnabled() ? 'Ativa' : 'Inativa'; ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>

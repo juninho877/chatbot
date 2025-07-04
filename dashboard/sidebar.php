@@ -16,9 +16,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </button>
 
 <!-- Sidebar para desktop (sempre visível em md+) e mobile (toggle) -->
-<div id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40 md:static md:z-0 md:h-screen flex flex-col w-64 bg-gray-800 text-gray-100 border-r border-gray-700">
+<div id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40 md:static md:z-0 md:h-screen flex flex-col w-64 bg-gray-800 dark:bg-slate-800 text-gray-100 border-r border-gray-700 dark:border-slate-600">
     <div class="flex items-center justify-between p-4 border-b border-gray-700">
-        <h1 class="text-xl font-bold text-white"><?php echo isset($GLOBALS['SITE_NAME']) ? $GLOBALS['SITE_NAME'] : 'ClientManager Pro'; ?></h1>
+        <h1 class="text-xl font-bold text-white dark:text-slate-100"><?php echo isset($GLOBALS['SITE_NAME']) ? $GLOBALS['SITE_NAME'] : 'ClientManager Pro'; ?></h1>
+        <!-- Dark Mode Toggle -->
+        <div class="flex items-center space-x-2">
+            <button id="darkModeToggle" class="dark-mode-toggle" title="Alternar modo escuro">
+                <span class="sr-only">Alternar modo escuro</span>
+            </button>
+        </div>
         <button onclick="toggleSidebar()" class="text-white md:hidden focus:outline-none">
             <i class="fas fa-times"></i>
         </button>
@@ -26,31 +32,31 @@ $current_page = basename($_SERVER['PHP_SELF']);
     
     <div class="flex-grow overflow-y-auto">
         <nav class="px-4 py-4 space-y-2">
-            <a href="index.php" class="<?php echo $current_page == 'index.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="index.php" class="sidebar-link <?php echo $current_page == 'index.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-home mr-3"></i>
                 Dashboard
             </a>
-            <a href="clients.php" class="<?php echo $current_page == 'clients.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="clients.php" class="sidebar-link <?php echo $current_page == 'clients.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-users mr-3"></i>
                 Clientes
             </a>
-            <a href="messages.php" class="<?php echo $current_page == 'messages.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="messages.php" class="sidebar-link <?php echo $current_page == 'messages.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fab fa-whatsapp mr-3"></i>
                 Mensagens
             </a>
-            <a href="templates.php" class="<?php echo $current_page == 'templates.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="templates.php" class="sidebar-link <?php echo $current_page == 'templates.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-file-alt mr-3"></i>
                 Templates
             </a>
-            <a href="whatsapp.php" class="<?php echo $current_page == 'whatsapp.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="whatsapp.php" class="sidebar-link <?php echo $current_page == 'whatsapp.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-qrcode mr-3"></i>
                 WhatsApp
             </a>
-            <a href="reports.php" class="<?php echo $current_page == 'reports.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="reports.php" class="sidebar-link <?php echo $current_page == 'reports.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-chart-bar mr-3"></i>
                 Relatórios
             </a>
-            <a href="user_settings.php" class="<?php echo $current_page == 'user_settings.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="user_settings.php" class="sidebar-link <?php echo $current_page == 'user_settings.php' ? 'bg-blue-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-user-cog mr-3"></i>
                 Minhas Configurações
             </a>
@@ -62,19 +68,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Administração</span>
             </div>
             
-            <a href="users.php" class="<?php echo $current_page == 'users.php' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="users.php" class="sidebar-link <?php echo $current_page == 'users.php' ? 'bg-red-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-users-cog mr-3"></i>
                 Gerenciar Usuários
                 <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
             </a>
             
-            <a href="plans.php" class="<?php echo $current_page == 'plans.php' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="plans.php" class="sidebar-link <?php echo $current_page == 'plans.php' ? 'bg-red-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-tags mr-3"></i>
                 Gerenciar Planos
                 <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
             </a>
             
-            <a href="settings.php" class="<?php echo $current_page == 'settings.php' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            <a href="settings.php" class="sidebar-link <?php echo $current_page == 'settings.php' ? 'bg-red-600 text-white active' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?> group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                 <i class="fas fa-cog mr-3"></i>
                 Configurações Sistema
                 <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
@@ -83,7 +89,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </nav>
     </div>
     
-    <div class="border-t border-gray-700 p-4">
+    <div class="sidebar-user-info border-t border-gray-700 dark:border-slate-600 p-4">
         <div class="flex items-center">
             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
                 <i class="fas fa-user text-gray-300"></i>
@@ -126,5 +132,46 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 document.body.classList.remove('overflow-hidden');
             }
         }
+    });
+    
+    // Dark Mode Toggle Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved dark mode preference or default to light mode
+        const savedTheme = localStorage.getItem('darkMode');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'enabled' || (!savedTheme && prefersDark)) {
+            html.classList.add('dark');
+            darkModeToggle.classList.add('active');
+        }
+        
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', function() {
+            html.classList.toggle('dark');
+            darkModeToggle.classList.toggle('active');
+            
+            // Save preference
+            if (html.classList.contains('dark')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (!localStorage.getItem('darkMode')) {
+                if (e.matches) {
+                    html.classList.add('dark');
+                    darkModeToggle.classList.add('active');
+                } else {
+                    html.classList.remove('dark');
+                    darkModeToggle.classList.remove('active');
+                }
+            }
+        });
     });
 </script>

@@ -365,9 +365,10 @@ if ($instance_name) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -375,7 +376,7 @@ if ($instance_name) {
             <main class="flex-1 relative overflow-y-auto focus:outline-none">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-3xl font-bold text-gray-900">Configuração do WhatsApp</h1>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Configuração do WhatsApp</h1>
                     </div>
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         
@@ -399,9 +400,9 @@ if ($instance_name) {
                         <?php endif; ?>
 
                         <!-- Status da Conexão -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Status da Conexão</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Status da Conexão</h3>
                                 
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
@@ -414,7 +415,7 @@ if ($instance_name) {
                                         <?php endif; ?>
                                     </div>
                                     <div class="ml-5">
-                                        <p class="text-xl font-medium text-gray-900">
+                                        <p class="text-xl font-medium text-gray-900 dark:text-slate-100">
                                             <?php if ($connection_state == 'open'): ?>
                                                 WhatsApp Conectado
                                             <?php elseif ($connection_state == 'connecting'): ?>
@@ -423,7 +424,7 @@ if ($instance_name) {
                                                 WhatsApp Desconectado
                                             <?php endif; ?>
                                         </p>
-                                        <p class="text-sm text-gray-500 mt-1">
+                                        <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">
                                             Instância: <?php echo htmlspecialchars($instance_name); ?>
                                         </p>
                                         <?php if ($connection_state == 'connecting'): ?>
@@ -437,7 +438,7 @@ if ($instance_name) {
                                                 Pronto para enviar mensagens automáticas!
                                             </p>
                                         <?php else: ?>
-                                            <p class="text-sm text-gray-600 mt-2">
+                                            <p class="text-sm text-gray-600 dark:text-slate-400 mt-2">
                                                 <i class="fas fa-info-circle mr-1"></i>
                                                 Conecte seu WhatsApp para começar a usar a automação
                                             </p>
@@ -448,9 +449,9 @@ if ($instance_name) {
                         </div>
 
                         <!-- Configuração do WhatsApp -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">
                                     <?php if ($is_connected): ?>
                                         Gerenciar Conexão
                                     <?php else: ?>
@@ -489,14 +490,14 @@ if ($instance_name) {
                                 <?php else: ?>
                                     <!-- WhatsApp não conectado -->
                                     <div class="mb-6">
-                                        <p class="text-gray-600 mb-4">
+                                        <p class="text-gray-600 dark:text-slate-400 mb-4">
                                             Para usar a automação de mensagens, você precisa conectar seu WhatsApp. 
                                             O processo é simples e seguro.
                                         </p>
                                         
                                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                                            <h4 class="text-sm font-medium text-blue-800 mb-2">Como funciona:</h4>
-                                            <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
+                                            <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Como funciona:</h4>
+                                            <ol class="list-decimal list-inside text-sm text-blue-700 dark:text-blue-300 space-y-1">
                                                 <li>Clique no botão "Conectar WhatsApp" abaixo</li>
                                                 <li>Um QR Code será gerado automaticamente</li>
                                                 <li>Abra o WhatsApp no seu celular</li>
@@ -518,18 +519,18 @@ if ($instance_name) {
                                     <!-- QR Code -->
                                     <?php if ($qr_code): ?>
                                     <div class="border-t pt-6">
-                                        <h4 class="text-lg font-medium text-gray-900 mb-4">Escaneie o QR Code</h4>
-                                        <div class="bg-gray-50 p-6 rounded-lg text-center">
+                                        <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Escaneie o QR Code</h4>
+                                        <div class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg text-center">
                                             <div class="qr-code-container mb-4">
                                                 <img src="data:image/png;base64,<?php echo $qr_code; ?>" 
                                                      alt="QR Code WhatsApp" 
-                                                     class="mx-auto border-2 border-gray-200 p-3 rounded-lg shadow-sm bg-white"
+                                                     class="mx-auto border-2 border-gray-200 dark:border-slate-600 p-3 rounded-lg shadow-sm bg-white"
                                                      style="max-width: 280px; height: auto;">
                                             </div>
-                                            <p class="text-sm text-gray-600 mb-3">
+                                            <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">
                                                 Escaneie este QR Code com seu WhatsApp
                                             </p>
-                                            <p class="text-xs text-gray-500 mb-4">
+                                            <p class="text-xs text-gray-500 dark:text-slate-500 mb-4">
                                                 O QR Code expira em alguns minutos. Se não funcionar, gere um novo.
                                             </p>
                                             <form method="POST" class="inline">
@@ -545,12 +546,12 @@ if ($instance_name) {
                                     
                                     <!-- Instruções detalhadas -->
                                     <div class="border-t pt-6 mt-6">
-                                        <h4 class="text-lg font-medium text-gray-900 mb-3">
+                                        <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 mb-3">
                                             <i class="fas fa-mobile-alt text-green-500 mr-2"></i>
                                             Instruções Detalhadas
                                         </h4>
-                                        <div class="bg-gray-50 rounded-lg p-4">
-                                            <ol class="list-decimal list-inside text-sm text-gray-700 space-y-2">
+                                        <div class="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
+                                            <ol class="list-decimal list-inside text-sm text-gray-700 dark:text-slate-300 space-y-2">
                                                 <li><strong>Abra o WhatsApp</strong> no seu celular</li>
                                                 <li>Toque nos <strong>três pontos</strong> (menu) no canto superior direito</li>
                                                 <li>Selecione <strong>"Dispositivos conectados"</strong></li>
@@ -560,7 +561,7 @@ if ($instance_name) {
                                             </ol>
                                             
                                             <div class="mt-4 p-3 bg-blue-100 rounded border-l-4 border-blue-400">
-                                                <p class="text-sm text-blue-800">
+                                                <p class="text-sm text-blue-800 dark:text-blue-300">
                                                     <i class="fas fa-info-circle mr-1"></i>
                                                     <strong>Importante:</strong> Após conectar, você pode fechar o WhatsApp no celular. 
                                                     A automação funcionará independentemente do WhatsApp estar aberto no seu dispositivo.

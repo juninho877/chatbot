@@ -153,9 +153,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -164,7 +165,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex justify-between items-center">
-                            <h1 class="text-3xl font-bold text-gray-900">Clientes</h1>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Clientes</h1>
                             <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md hover:shadow-lg transition-shadow duration-300">
                                 <i class="fas fa-plus mr-2"></i>
                                 Adicionar Cliente
@@ -193,13 +194,13 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <?php endif; ?>
 
                         <!-- Lista de Clientes -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-4 py-5 sm:p-6">
                                 <?php if (empty($clients)): ?>
                                     <div class="text-center py-12">
                                         <i class="fas fa-users text-gray-300 text-7xl mb-4"></i>
-                                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum cliente cadastrado</h3>
-                                        <p class="text-lg text-gray-500 mb-4">Comece adicionando seu primeiro cliente</p>
+                                        <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Nenhum cliente cadastrado</h3>
+                                        <p class="text-lg text-gray-500 dark:text-slate-400 mb-4">Comece adicionando seu primeiro cliente</p>
                                         <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md hover:shadow-lg transition-shadow duration-300">
                                             <i class="fas fa-plus mr-2"></i>
                                             Adicionar Primeiro Cliente
@@ -207,42 +208,42 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     </div>
                                 <?php else: ?>
                                     <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
+                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-600">
+                                            <thead class="bg-gray-50 dark:bg-slate-700">
                                                 <tr class="text-xs md:text-sm">
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Contato</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Assinatura</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Vencimento</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Cliente</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Contato</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Assinatura</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Vencimento</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Ações</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
                                                 <?php foreach ($clients as $client_row): ?>
-                                                <tr class="hover:bg-gray-50 border-b border-gray-100 text-xs md:text-sm">
+                                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-700 border-b border-gray-100 dark:border-slate-600 text-xs md:text-sm">
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div>
-                                                            <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($client_row['name']); ?></div>
+                                                            <div class="text-sm font-medium text-gray-900 dark:text-slate-100"><?php echo htmlspecialchars($client_row['name']); ?></div>
                                                             <?php if ($client_row['document']): ?>
-                                                                <div class="text-sm text-gray-500"><?php echo htmlspecialchars($client_row['document']); ?></div>
+                                                                <div class="text-sm text-gray-500 dark:text-slate-400"><?php echo htmlspecialchars($client_row['document']); ?></div>
                                                             <?php endif; ?>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-sm text-gray-900"><?php echo htmlspecialchars($client_row['phone']); ?></div>
+                                                        <div class="text-sm text-gray-900 dark:text-slate-100"><?php echo htmlspecialchars($client_row['phone']); ?></div>
                                                         <?php if ($client_row['email']): ?>
-                                                            <div class="text-sm text-gray-500"><?php echo htmlspecialchars($client_row['email']); ?></div>
+                                                            <div class="text-sm text-gray-500 dark:text-slate-400"><?php echo htmlspecialchars($client_row['email']); ?></div>
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <?php if ($client_row['subscription_amount']): ?>
-                                                            <div class="text-sm font-medium text-gray-900">R$ <?php echo number_format($client_row['subscription_amount'], 2, ',', '.'); ?></div>
+                                                            <div class="text-sm font-medium text-gray-900 dark:text-slate-100">R$ <?php echo number_format($client_row['subscription_amount'], 2, ',', '.'); ?></div>
                                                             <?php if ($client_row['last_payment_date']): ?>
-                                                                <div class="text-xs text-gray-500">Último: <?php echo date('d/m/Y', strtotime($client_row['last_payment_date'])); ?></div>
+                                                                <div class="text-xs text-gray-500 dark:text-slate-400">Último: <?php echo date('d/m/Y', strtotime($client_row['last_payment_date'])); ?></div>
                                                             <?php endif; ?>
                                                         <?php else: ?>
-                                                            <span class="text-sm text-gray-400">Não definido</span>
+                                                            <span class="text-sm text-gray-400 dark:text-slate-500">Não definido</span>
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -253,7 +254,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                             $diff = $today->diff($due_date);
                                                             $days_diff = $diff->invert ? -$diff->days : $diff->days;
                                                             ?>
-                                                            <div class="text-sm text-gray-900"><?php echo $due_date->format('d/m/Y'); ?></div>
+                                                            <div class="text-sm text-gray-900 dark:text-slate-100"><?php echo $due_date->format('d/m/Y'); ?></div>
                                                             <?php if ($days_diff < 0): ?>
                                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                                                                     <?php echo abs($days_diff); ?> dias em atraso
@@ -264,7 +265,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                                 </span>
                                                             <?php endif; ?>
                                                         <?php else: ?>
-                                                            <span class="text-sm text-gray-400">Não definido</span>
+                                                            <span class="text-sm text-gray-400 dark:text-slate-500">Não definido</span>
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -306,10 +307,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </div>
 
     <!-- Modal para adicionar/editar cliente -->
-    <div id="clientModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-blue-600">
+    <div id="clientModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-blue-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modalTitle">Adicionar Cliente</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4" id="modalTitle">Adicionar Cliente</h3>
                 <form id="clientForm" method="POST">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="clientId">
@@ -317,36 +318,36 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Informações Básicas -->
                         <div class="space-y-4">
-                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Informações Básicas</h4>
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 border-b dark:border-slate-600 pb-2">Informações Básicas</h4>
                             
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">Nome *</label>
+                                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome *</label>
                                 <input type="text" name="name" id="name" required 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Email</label>
                                 <input type="email" name="email" id="email" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-700">Telefone/WhatsApp *</label>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone/WhatsApp *</label>
                                 <input type="tel" name="phone" id="phone" required 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="document" class="block text-sm font-medium text-gray-700">CPF/CNPJ</label>
+                                <label for="document" class="block text-sm font-medium text-gray-700 dark:text-slate-300">CPF/CNPJ</label>
                                 <input type="text" name="document" id="document" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Status</label>
                                 <select name="status" id="status" 
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                        class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                     <option value="active">Ativo</option>
                                     <option value="inactive">Inativo</option>
                                     <option value="pending">Pendente</option>
@@ -356,31 +357,31 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         
                         <!-- Informações de Assinatura -->
                         <div class="space-y-4">
-                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Assinatura e Pagamentos</h4>
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-slate-100 border-b dark:border-slate-600 pb-2">Assinatura e Pagamentos</h4>
                             
                             <div>
-                                <label for="subscription_amount" class="block text-sm font-medium text-gray-700">Valor da Assinatura (R$)</label>
+                                <label for="subscription_amount" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Valor da Assinatura (R$)</label>
                                 <input type="number" name="subscription_amount" id="subscription_amount" step="0.01" min="0"
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                        placeholder="0,00">
                             </div>
                             
                             <div>
-                                <label for="due_date" class="block text-sm font-medium text-gray-700">Data de Vencimento</label>
+                                <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Vencimento</label>
                                 <input type="date" name="due_date" id="due_date" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="last_payment_date" class="block text-sm font-medium text-gray-700">Último Pagamento</label>
+                                <label for="last_payment_date" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Último Pagamento</label>
                                 <input type="date" name="last_payment_date" id="last_payment_date" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="next_payment_date" class="block text-sm font-medium text-gray-700">Próximo Pagamento</label>
+                                <label for="next_payment_date" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Próximo Pagamento</label>
                                 <input type="date" name="next_payment_date" id="next_payment_date" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                         </div>
                     </div>
@@ -388,20 +389,20 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     <!-- Campos que ocupam toda a largura -->
                     <div class="mt-4 space-y-4">
                         <div>
-                            <label for="address" class="block text-sm font-medium text-gray-700">Endereço</label>
+                            <label for="address" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Endereço</label>
                             <textarea name="address" id="address" rows="2" 
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"></textarea>
+                                      class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"></textarea>
                         </div>
                         
                         <div>
-                            <label for="notes" class="block text-sm font-medium text-gray-700">Observações</label>
+                            <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Observações</label>
                             <textarea name="notes" id="notes" rows="3" 
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"></textarea>
+                                      class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"></textarea>
                         </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">

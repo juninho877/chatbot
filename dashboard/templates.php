@@ -148,9 +148,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -159,7 +160,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex justify-between items-center">
-                            <h1 class="text-3xl font-bold text-gray-900">Templates de Mensagem</h1>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Templates de Mensagem</h1>
                             <button onclick="openModal()" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition duration-150 shadow-md hover:shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
                                 Criar Template
@@ -188,59 +189,59 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <?php endif; ?>
 
                         <!-- Templates Predefinidos -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Templates Sugeridos</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Templates Sugeridos</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <!-- Templates para períodos específicos -->
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Aviso 5 dias antes</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Aviso 5 dias antes</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊</p>
                                         <button onclick="useTemplate('Aviso 5 dias antes', 'due_5_days_before', 'Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Lembrete 3 dias antes</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Lembrete 3 dias antes</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!</p>
                                         <button onclick="useTemplate('Lembrete 3 dias antes', 'due_3_days_before', 'Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Aviso 2 dias antes</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Aviso 2 dias antes</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔</p>
                                         <button onclick="useTemplate('Aviso 2 dias antes', 'due_2_days_before', 'Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Último aviso (1 dia antes)</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Último aviso (1 dia antes)</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️</p>
                                         <button onclick="useTemplate('Último aviso (1 dia antes)', 'due_1_day_before', 'Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Vencimento hoje</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Vencimento hoje</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏</p>
                                         <button onclick="useTemplate('Vencimento hoje', 'due_today', 'Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Atraso 1 dia</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Atraso 1 dia</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨</p>
                                         <button onclick="useTemplate('Atraso 1 dia', 'overdue_1_day', 'Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
@@ -248,18 +249,18 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     </div>
                                     
                                     <!-- Templates clássicos -->
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Cobrança Amigável</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Cobrança Amigável</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!</p>
                                         <button onclick="useTemplate('Cobrança Amigável', 'cobranca', 'Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Boas Vindas</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Bem-vindo(a) {nome}! Obrigado por escolher nossos serviços. Sua primeira mensalidade é de {valor}.</p>
+                                    <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
+                                        <h4 class="font-semibold text-gray-900 dark:text-slate-100 mb-2">Boas Vindas</h4>
+                                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Bem-vindo(a) {nome}! Obrigado por escolher nossos serviços. Sua primeira mensalidade é de {valor}.</p>
                                         <button onclick="useTemplate('Boas Vindas', 'boas_vindas', 'Bem-vindo(a) {nome}! Obrigado por escolher nossos serviços. Sua primeira mensalidade é de {valor}.')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
@@ -270,15 +271,15 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         </div>
 
                         <!-- Lista de Templates -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Meus Templates</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Meus Templates</h3>
                                 
                                 <?php if (empty($templates)): ?>
                                     <div class="text-center py-12">
                                         <i class="fas fa-file-alt text-gray-300 text-7xl mb-4"></i>
-                                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum template criado</h3>
-                                        <p class="text-lg text-gray-500 mb-4">Crie seu primeiro template de mensagem</p>
+                                        <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Nenhum template criado</h3>
+                                        <p class="text-lg text-gray-500 dark:text-slate-400 mb-4">Crie seu primeiro template de mensagem</p>
                                         <button onclick="openModal()" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition duration-150 shadow-md">
                                             <i class="fas fa-plus mr-2"></i>
                                             Criar Primeiro Template
@@ -287,9 +288,9 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                 <?php else: ?>
                                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         <?php foreach ($templates as $template_row): ?>
-                                        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-300">
+                                        <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-6 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-700">
                                             <div class="flex justify-between items-start mb-3">
-                                                <h4 class="font-semibold text-gray-900"><?php echo htmlspecialchars($template_row['name']); ?></h4>
+                                                <h4 class="font-semibold text-gray-900 dark:text-slate-100"><?php echo htmlspecialchars($template_row['name']); ?></h4>
                                                 <div class="flex space-x-2">
                                                     <?php if ($template_row['active']): ?>
                                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-200 text-green-800">Ativo</span>
@@ -335,12 +336,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                 </span>
                                             </div>
                                             
-                                            <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+                                            <p class="text-sm text-gray-600 dark:text-slate-400 mb-4 line-clamp-3">
                                                 <?php echo htmlspecialchars(substr($template_row['message'], 0, 100)) . (strlen($template_row['message']) > 100 ? '...' : ''); ?>
                                             </p>
                                             
                                             <div class="flex justify-between items-center">
-                                                <span class="text-xs text-gray-500">
+                                                <span class="text-xs text-gray-500 dark:text-slate-400">
                                                     <?php echo date('d/m/Y', strtotime($template_row['created_at'])); ?>
                                                 </span>
                                                 <div class="flex space-x-2">
@@ -367,26 +368,26 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </div>
 
     <!-- Modal para adicionar/editar template -->
-    <div id="templateModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-purple-600">
+    <div id="templateModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-purple-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modalTitle">Criar Template</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4" id="modalTitle">Criar Template</h3>
                 <form id="templateForm" method="POST">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="templateId">
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nome do Template *</label>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome do Template *</label>
                             <input type="text" name="name" id="name" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5"
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                    placeholder="Ex: Cobrança Mensal">
                         </div>
                         
                         <div>
-                            <label for="type" class="block text-sm font-medium text-gray-700">Tipo</label>
+                            <label for="type" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Tipo</label>
                             <select name="type" id="type" 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
+                                    class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                                 <optgroup label="Períodos de Notificação">
                                     <option value="due_5_days_before">5 dias antes do vencimento</option>
                                     <option value="due_3_days_before">3 dias antes do vencimento</option>
@@ -405,11 +406,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         </div>
                         
                         <div>
-                            <label for="message" class="block text-sm font-medium text-gray-700">Mensagem *</label>
+                            <label for="message" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Mensagem *</label>
                             <textarea name="message" id="message" rows="6" required 
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5"
+                                      class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                       placeholder="Digite a mensagem do template..."></textarea>
-                            <p class="mt-1 text-xs text-gray-500">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">
                                 Variáveis disponíveis: {nome}, {valor}, {vencimento}
                             </p>
                         </div>
@@ -417,14 +418,14 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <div class="flex items-center">
                             <input type="checkbox" name="active" id="active" checked 
                                    class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                            <label for="active" class="ml-2 block text-sm text-gray-700">
+                            <label for="active" class="ml-2 block text-sm text-gray-700 dark:text-slate-300">
                                 Template ativo
                             </label>
                         </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition duration-150 shadow-md">

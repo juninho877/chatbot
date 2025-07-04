@@ -154,9 +154,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-900">
+    <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
         <?php include 'sidebar.php'; ?>
 
         <!-- Main content -->
@@ -166,8 +167,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Gerenciar Planos</h1>
-                                <p class="mt-1 text-sm text-gray-600">Administre os planos de assinatura do sistema</p>
+                                <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Gerenciar Planos</h1>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">Administre os planos de assinatura do sistema</p>
                             </div>
                             <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md hover:shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
@@ -199,10 +200,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <!-- Lista de Planos -->
                         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <?php foreach ($plans as $plan_row): ?>
-                            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                            <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                                 <div class="p-6">
                                     <div class="flex justify-between items-start mb-4">
-                                        <h3 class="text-xl font-semibold text-gray-900"><?php echo htmlspecialchars($plan_row['name']); ?></h3>
+                                        <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100"><?php echo htmlspecialchars($plan_row['name']); ?></h3>
                                         <div class="flex space-x-2">
                                             <button onclick="editPlan(<?php echo htmlspecialchars(json_encode($plan_row)); ?>)" 
                                                     class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-gray-200 transition duration-150">
@@ -218,22 +219,22 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     </div>
                                     
                                     <div class="mb-4">
-                                        <div class="text-3xl font-bold text-blue-600">
+                                        <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">
                                             R$ <?php echo number_format($plan_row['price'], 2, ',', '.'); ?>
-                                            <span class="text-sm font-normal text-gray-500">/mês</span>
+                                            <span class="text-sm font-normal text-gray-500 dark:text-slate-400">/mês</span>
                                         </div>
                                     </div>
                                     
                                     <?php if ($plan_row['description']): ?>
-                                        <p class="text-gray-600 mb-4"><?php echo htmlspecialchars($plan_row['description']); ?></p>
+                                        <p class="text-gray-600 dark:text-slate-400 mb-4"><?php echo htmlspecialchars($plan_row['description']); ?></p>
                                     <?php endif; ?>
                                     
                                     <div class="mb-4">
-                                        <div class="text-sm text-gray-600">
+                                        <div class="text-sm text-gray-600 dark:text-slate-400">
                                             <strong>Máximo de clientes:</strong> 
                                             <?php echo $plan_row['max_clients'] == 9999 ? 'Ilimitado' : number_format($plan_row['max_clients']); ?>
                                         </div>
-                                        <div class="text-sm text-gray-600 mt-1">
+                                        <div class="text-sm text-gray-600 dark:text-slate-400 mt-1">
                                             <strong>Usuários ativos:</strong> <?php echo $plan_row['users_count']; ?>
                                         </div>
                                     </div>
@@ -243,8 +244,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     if (!empty($features)): 
                                     ?>
                                         <div class="mb-4">
-                                            <h4 class="text-sm font-medium text-gray-900 mb-2">Funcionalidades:</h4>
-                                            <ul class="text-sm text-gray-600 space-y-1">
+                                            <h4 class="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Funcionalidades:</h4>
+                                            <ul class="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                                                 <?php foreach ($features as $feature): ?>
                                                     <li class="flex items-center">
                                                         <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
@@ -255,7 +256,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="text-xs text-gray-500">
+                                    <div class="text-xs text-gray-500 dark:text-slate-500">
                                         Criado em: <?php echo date('d/m/Y', strtotime($plan_row['created_at'])); ?>
                                     </div>
                                 </div>
@@ -269,10 +270,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     </div>
 
     <!-- Modal para adicionar/editar plano -->
-    <div id="planModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-blue-600">
+    <div id="planModal" class="modal-overlay fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800 border-t-4 border-blue-600">
             <div class="mt-3">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modalTitle">Adicionar Plano</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4" id="modalTitle">Adicionar Plano</h3>
                 <form id="planForm" method="POST">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="planId">
@@ -280,37 +281,37 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">Nome do Plano *</label>
+                                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome do Plano *</label>
                                 <input type="text" name="name" id="name" required 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                             
                             <div>
-                                <label for="price" class="block text-sm font-medium text-gray-700">Preço (R$) *</label>
+                                <label for="price" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Preço (R$) *</label>
                                 <input type="number" name="price" id="price" step="0.01" min="0" required 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                       class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
                             </div>
                         </div>
                         
                         <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
+                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Descrição</label>
                             <textarea name="description" id="description" rows="3" 
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"></textarea>
+                                      class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"></textarea>
                         </div>
                         
                         <div>
-                            <label for="max_clients" class="block text-sm font-medium text-gray-700">Máximo de Clientes *</label>
+                            <label for="max_clients" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Máximo de Clientes *</label>
                             <input type="number" name="max_clients" id="max_clients" min="1" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                            <p class="mt-1 text-xs text-gray-500">Use 9999 para ilimitado</p>
+                                   class="mt-1 block w-full border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Use 9999 para ilimitado</p>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Funcionalidades</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Funcionalidades</label>
                             <div id="featuresContainer">
                                 <div class="feature-input flex items-center mb-2">
                                     <input type="text" name="features[]" 
-                                           class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                           class="flex-1 border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                                            placeholder="Digite uma funcionalidade">
                                     <button type="button" onclick="removeFeature(this)" 
                                             class="ml-2 text-red-600 hover:text-red-800 p-2">
@@ -327,7 +328,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                        <button type="button" onclick="closeModal()" class="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">
                             Cancelar
                         </button>
                         <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">

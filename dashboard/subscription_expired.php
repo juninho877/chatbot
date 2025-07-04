@@ -56,44 +56,45 @@ $subscription_info = $user->getSubscriptionInfo();
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/dark_mode.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
 </head>
-<body class="bg-gradient-to-br from-red-50 to-orange-100 min-h-screen">
+<body class="bg-gradient-to-br from-red-50 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 min-h-screen">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <!-- Header -->
             <div class="text-center">
-                <div class="mx-auto h-16 w-16 bg-red-600 rounded-full flex items-center justify-center mb-4">
+                <div class="mx-auto h-16 w-16 bg-red-600 dark:bg-red-700 rounded-full flex items-center justify-center mb-4">
                     <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
                 </div>
-                <h2 class="text-3xl font-extrabold text-gray-900">
+                <h2 class="text-3xl font-extrabold text-gray-900 dark:text-slate-100">
                     <?php if ($user->subscription_status === 'trial'): ?>
                         Período de Teste Expirado
                     <?php else: ?>
                         Assinatura Expirada
                     <?php endif; ?>
                 </h2>
-                <p class="mt-2 text-sm text-gray-600">
+                <p class="mt-2 text-sm text-gray-600 dark:text-slate-400">
                     Olá, <?php echo htmlspecialchars($user->name); ?>!
                 </p>
             </div>
 
             <!-- Status Card -->
-            <div class="bg-white py-8 px-6 shadow-xl rounded-lg border-l-4 border-red-500">
+            <div class="bg-white dark:bg-slate-800 py-8 px-6 shadow-xl rounded-lg border-l-4 border-red-500">
                 <div class="space-y-4">
                     <!-- Status da Assinatura -->
-                    <div class="bg-red-50 p-4 rounded-lg">
+                    <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-times-circle text-red-500 mr-3"></i>
                             <div>
-                                <h3 class="text-sm font-medium text-red-800">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
                                     <?php if ($user->subscription_status === 'trial'): ?>
                                         Seu período de teste de 3 dias expirou
                                     <?php else: ?>
                                         Sua assinatura não está mais ativa
                                     <?php endif; ?>
                                 </h3>
-                                <p class="text-sm text-red-700 mt-1">
+                                <p class="text-sm text-red-700 dark:text-red-300 mt-1">
                                     <?php if ($user->subscription_status === 'trial'): ?>
                                         Período de teste: 
                                         <?php 
@@ -121,13 +122,13 @@ $subscription_info = $user->getSubscriptionInfo();
                     </div>
 
                     <!-- Informações do Plano -->
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="text-sm font-medium text-blue-800 mb-2">Seu Plano</h4>
-                        <div class="text-sm text-blue-700">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                        <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Seu Plano</h4>
+                        <div class="text-sm text-blue-700 dark:text-blue-300">
                             <p><strong>Plano:</strong> <?php echo htmlspecialchars($plan_name); ?></p>
                             <p><strong>Valor:</strong> R$ <?php echo number_format($plan_price, 2, ',', '.'); ?>/mês</p>
                             <p><strong>Status:</strong> 
-                                <span class="font-semibold text-red-600">
+                                <span class="font-semibold text-red-600 dark:text-red-400">
                                     <?php 
                                     switch($user->subscription_status) {
                                         case 'trial':
@@ -149,27 +150,27 @@ $subscription_info = $user->getSubscriptionInfo();
                     </div>
 
                     <!-- Funcionalidades Bloqueadas -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="text-sm font-medium text-gray-800 mb-2">Funcionalidades Bloqueadas</h4>
-                        <ul class="text-sm text-gray-600 space-y-1">
+                    <div class="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-800 dark:text-slate-200 mb-2">Funcionalidades Bloqueadas</h4>
+                        <ul class="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                             <li class="flex items-center">
-                                <i class="fas fa-lock text-gray-400 mr-2"></i>
+                                <i class="fas fa-lock text-gray-400 dark:text-slate-500 mr-2"></i>
                                 Gestão de clientes
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-lock text-gray-400 mr-2"></i>
+                                <i class="fas fa-lock text-gray-400 dark:text-slate-500 mr-2"></i>
                                 Envio de mensagens WhatsApp
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-lock text-gray-400 mr-2"></i>
+                                <i class="fas fa-lock text-gray-400 dark:text-slate-500 mr-2"></i>
                                 Templates de mensagem
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-lock text-gray-400 mr-2"></i>
+                                <i class="fas fa-lock text-gray-400 dark:text-slate-500 mr-2"></i>
                                 Relatórios e análises
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-lock text-gray-400 mr-2"></i>
+                                <i class="fas fa-lock text-gray-400 dark:text-slate-500 mr-2"></i>
                                 Automação de cobrança
                             </li>
                         </ul>
@@ -185,13 +186,13 @@ $subscription_info = $user->getSubscriptionInfo();
                     </a>
                     
                     <a href="../index.php" 
-                       class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
+                       class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
                         <i class="fas fa-home mr-2"></i>
                         Voltar ao Site
                     </a>
                     
                     <a href="../logout.php" 
-                       class="w-full flex justify-center py-2 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 transition duration-150">
+                       class="w-full flex justify-center py-2 px-4 text-sm font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition duration-150">
                         <i class="fas fa-sign-out-alt mr-2"></i>
                         Fazer Logout
                     </a>
@@ -199,9 +200,9 @@ $subscription_info = $user->getSubscriptionInfo();
             </div>
 
             <!-- Informações de Contato -->
-            <div class="bg-white p-4 rounded-lg shadow-sm">
-                <h4 class="text-sm font-medium text-gray-800 mb-2">Precisa de Ajuda?</h4>
-                <p class="text-sm text-gray-600 mb-3">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm">
+                <h4 class="text-sm font-medium text-gray-800 dark:text-slate-200 mb-2">Precisa de Ajuda?</h4>
+                <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">
                     Entre em contato conosco se tiver dúvidas sobre sua assinatura ou pagamento.
                 </p>
                 <div class="flex space-x-4 text-sm">
@@ -217,7 +218,7 @@ $subscription_info = $user->getSubscriptionInfo();
             </div>
 
             <!-- Benefícios da Renovação -->
-            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg text-white">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 p-6 rounded-lg text-white">
                 <h4 class="font-semibold mb-3">
                     <i class="fas fa-star mr-2"></i>
                     Benefícios da Renovação

@@ -552,7 +552,7 @@ if ($instance_name) {
         setInterval(function() {
             console.log('Checking connection status...');
             location.reload();
-        }, 30000);
+        }, 10000);
         <?php endif; ?>
 
         // Mostrar loading ao submeter formulários

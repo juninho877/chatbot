@@ -21,7 +21,11 @@ require_once 'config/database.php';
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?php echo getSiteName(); ?></h1>
+                        <?php if (!empty(SITE_LOGO_PATH)): ?>
+                            <img src="<?php echo SITE_LOGO_PATH; ?>" alt="<?php echo getSiteName(); ?>" class="h-8 w-auto">
+                        <?php else: ?>
+                            <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?php echo getSiteName(); ?></h1>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">

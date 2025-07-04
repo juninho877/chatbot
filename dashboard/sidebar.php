@@ -18,7 +18,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Sidebar para desktop (sempre visível em md+) e mobile (toggle) -->
 <div id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40 md:static md:z-0 md:h-screen flex flex-col w-64 bg-gray-800 dark:bg-slate-800 text-gray-100 border-r border-gray-700 dark:border-slate-600">
     <div class="flex items-center justify-between p-4 border-b border-gray-700">
-        <h1 class="text-xl font-bold text-white dark:text-slate-100"><?php echo getSiteName(); ?></h1>
+        <div class="flex-shrink-0">
+            <?php if (!empty(SITE_LOGO_PATH)): ?>
+                <img src="<?php echo SITE_LOGO_PATH; ?>" alt="<?php echo getSiteName(); ?>" class="h-8 w-auto">
+            <?php else: ?>
+                <h1 class="text-xl font-bold text-white dark:text-slate-100"><?php echo getSiteName(); ?></h1>
+            <?php endif; ?>
+        </div>
         <!-- Dark Mode Toggle -->
         <div class="flex items-center space-x-2">
             <button id="darkModeToggle" class="dark-mode-toggle" title="Alternar modo escuro">

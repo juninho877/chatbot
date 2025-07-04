@@ -99,6 +99,58 @@ if ($_POST) {
             // Processar upload do favicon se não houver erros
             $favicon_updated = false;
             $favicon_message = "";
+            $logo_updated = false;
+            $logo_message = "";
+            
+            // Processar upload do logo se não houver erros
+            if (!$has_error && isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
+                $logo_file = $_FILES['site_logo'];
+                
+                // Validar tipo de arquivo
+                $allowed_types = ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml'];
+                $file_type = $logo_file['type'];
+                $file_info = getimagesize($logo_file['tmp_name']);
+                
+                if (!in_array($file_type, $allowed_types) && !$file_info && $file_type !== 'image/svg+xml') {
+                    $has_error = true;
+                    $_SESSION['error'] = "Tipo de arquivo não suportado para logo. Use PNG, JPG, GIF ou SVG.";
+                } elseif ($logo_file['size'] > 2 * 1024 * 1024) {
+                    // Validar tamanho (máximo 2MB)
+                    $has_error = true;
+                    $_SESSION['error'] = "Arquivo muito grande. Máximo 2MB.";
+                } else {
+                    // Criar diretório de uploads se não existir
+                    $upload_dir = __DIR__ . '/../public/uploads/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+                    
+                    // Gerar nome único para o arquivo
+                    $file_extension = pathinfo($logo_file['name'], PATHINFO_EXTENSION);
+                    $new_filename = 'logo_' . time() . '.' . $file_extension;
+                    $upload_path = $upload_dir . $new_filename;
+                    $web_path = '/public/uploads/' . $new_filename;
+                    
+                    // Mover arquivo para diretório de uploads
+                    if (move_uploaded_file($logo_file['tmp_name'], $upload_path)) {
+                        // Remover logo anterior se existir
+                        $old_logo = $appSettings->get('site_logo_path');
+                        if ($old_logo && file_exists(__DIR__ . '/..' . $old_logo)) {
+                            unlink(__DIR__ . '/..' . $old_logo);
+                        }
+                        
+                        // Salvar novo caminho no banco
+                        if ($appSettings->set('site_logo_path', $web_path, 'Caminho para o logo do site', 'string')) {
+                            $updated++;
+                            $logo_updated = true;
+                            $logo_message = " Logo atualizado com sucesso!";
+                        }
+                    } else {
+                        $has_error = true;
+                        $_SESSION['error'] = "Erro ao fazer upload do logo.";
+                    }
+                }
+            }
             
             if (!$has_error && isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
                 $favicon_file = $_FILES['favicon'];
@@ -186,7 +238,10 @@ if ($_POST) {
                 if ($updated > 0 || $favicon_updated) {
                     $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
                     if ($favicon_updated) {
-                        $success_message .= $favicon_message;
+                        $success_message .= $favicon_message; 
+                    }
+                    if ($logo_updated) {
+                        $success_message .= $logo_message;
                     }
                     $_SESSION['message'] = $success_message;
                 } else {
@@ -324,6 +379,20 @@ $timezones = [
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="site_logo" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Logo do Site</label>
+                                            <input type="file" name="site_logo" id="site_logo" accept=".png,.jpg,.jpeg,.gif,.svg"
+                                                   class="mt-1 block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-800/30">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">Formatos: PNG, JPG, GIF, SVG (máx. 2MB, recomendado: 200x50px)</p>
+                                            <?php if (!empty($all_settings['site_logo_path']['value'])): ?>
+                                                <div class="mt-2 flex items-center">
+                                                    <img src="<?php echo htmlspecialchars($all_settings['site_logo_path']['value']); ?>" 
+                                                         alt="Logo atual" class="h-8 mr-2">
+                                                    <span class="text-xs text-gray-600 dark:text-slate-400">Logo atual</span>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                         
                                         <div>
@@ -562,6 +631,30 @@ $timezones = [
                     preview.innerHTML = `
                         <img src="${e.target.result}" alt="Preview do favicon" class="w-4 h-4 mr-2">
                         <span class="text-xs text-gray-600 dark:text-slate-400">Preview do novo favicon</span>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Preview do logo antes do upload
+        document.getElementById('site_logo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Criar preview se não existir
+                    let preview = document.getElementById('logo-preview');
+                    if (!preview) {
+                        preview = document.createElement('div');
+                        preview.id = 'logo-preview';
+                        preview.className = 'mt-2 flex items-center';
+                        document.getElementById('site_logo').parentNode.appendChild(preview);
+                    }
+                    
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview do logo" class="h-8 mr-2">
+                        <span class="text-xs text-gray-600 dark:text-slate-400">Preview do novo logo</span>
                     `;
                 };
                 reader.readAsDataURL(file);

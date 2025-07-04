@@ -27,7 +27,12 @@ date_default_timezone_set('America/Sao_Paulo');
 
 // Função para obter o nome do site
 function getSiteName() {
-    return getAppSetting('site_name', 'ClientManager Pro');
+    return SITE_NAME;
+}
+
+// Função para obter o caminho do logo do site
+function getSiteLogoPath() {
+    return SITE_LOGO_PATH;
 }
 
 // Função para obter configurações do banco de dados
@@ -59,6 +64,7 @@ function getAppSetting($key, $default = null) {
 define('ADMIN_EMAIL', getAppSetting('admin_email', 'admin@clientmanager.com'));
 define('SITE_NAME', getAppSetting('site_name', 'ClientManager Pro'));
 define('FAVICON_PATH', getAppSetting('favicon_path', '/favicon.ico'));
+define('SITE_LOGO_PATH', getAppSetting('site_logo_path', ''));
 
 // Atualizar timezone se configurado no banco
 $db_timezone = getAppSetting('timezone', 'America/Sao_Paulo');

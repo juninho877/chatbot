@@ -54,98 +54,125 @@ if ($_POST) {
                     error_log("=== CONNECT WHATSAPP ACTION ===");
                     error_log("Instance name: " . $instance_name);
                     
-                    // Variáveis para armazenar resultados temporários
                     $temp_error = '';
                     $temp_message = '';
                     $qr_generated = false;
-                    $instance_exists = false;
                     
-                    // PASSO 1: Verificar se a instância já existe verificando seu status
-                    error_log("Step 1: Checking if instance exists by getting status");
+                    // PASSO 1: Verificar status da instância primeiro
+                    error_log("Step 1: Checking instance status for " . $instance_name);
                     $status_result = $whatsapp->getInstanceStatus($instance_name);
                     
+                    $instance_state = null;
+                    $instance_exists = false;
+                    
                     if ($status_result['status_code'] == 200) {
-                        // Instância existe, verificar seu estado
                         $instance_exists = true;
-                        $current_state = 'disconnected';
-                        
                         if (isset($status_result['data']['instance']['state'])) {
-                            $current_state = $status_result['data']['instance']['state'];
+                            $instance_state = $status_result['data']['instance']['state'];
                         } elseif (isset($status_result['data']['state'])) {
-                            $current_state = $status_result['data']['state'];
+                            $instance_state = $status_result['data']['state'];
                         }
-                        
-                        error_log("Instance exists with state: " . $current_state);
-                        
-                        if ($current_state === 'open') {
-                            // Já está conectado!
-                            $temp_message = "WhatsApp já está conectado!";
+                        error_log("Instance exists with state: " . ($instance_state ?: 'unknown'));
+                    } else {
+                        error_log("Instance status check returned: " . $status_result['status_code']);
+                    }
+
+                    // CENÁRIO A: Instância já está conectada (open)
+                    if ($instance_state === 'open') {
+                        $message = "WhatsApp já está conectado!";
+                        $user->updateWhatsAppInstance($instance_name);
+                        $user->updateWhatsAppConnectedStatus(true);
+                        $_SESSION['whatsapp_instance'] = $instance_name;
+                        $_SESSION['whatsapp_connected'] = true;
+                        break; // Sair do switch
+                    }
+
+                    // CENÁRIO B: Instância existe mas não está conectada
+                    if ($instance_exists) {
+                        error_log("Instance exists but not connected, attempting to get QR code");
+                        $qr_result = $whatsapp->getQRCode($instance_name);
+
+                        if ($qr_result['status_code'] == 200 && isset($qr_result['data']['base64'])) {
+                            $qr_base64 = $qr_result['data']['base64'];
+                            if (strpos($qr_base64, 'data:image') === 0) {
+                                $qr_code = str_replace('data:image/png;base64,', '', $qr_base64);
+                            } else {
+                                $qr_code = $qr_base64;
+                            }
+                            $qr_generated = true;
+                            $temp_message = "QR Code gerado para reconexão! Escaneie com seu WhatsApp.";
                             
                             // Atualizar usuário no banco
                             $user->updateWhatsAppInstance($instance_name);
-                            $user->updateWhatsAppConnectedStatus(true);
                             $_SESSION['whatsapp_instance'] = $instance_name;
-                            $_SESSION['whatsapp_connected'] = true;
+                            $_SESSION['whatsapp_connected'] = false;
                             
                         } else {
-                            // Instância existe mas não está conectada, obter QR code
-                            error_log("Instance exists but not connected, getting QR code");
-                            $qr_result = $whatsapp->getQRCode($instance_name);
+                            // Se não conseguiu obter QR da instância existente, tentar deletar e recriar
+                            error_log("Failed to get QR from existing instance, attempting to delete and recreate");
+                            $delete_result = $whatsapp->deleteInstance($instance_name);
+                            error_log("Delete result: " . $delete_result['status_code']);
                             
-                            if ($qr_result['status_code'] == 200 && isset($qr_result['data']['base64'])) {
-                                $qr_base64 = $qr_result['data']['base64'];
+                            // Aguardar um momento para a API processar a exclusão
+                            sleep(3);
+                            
+                            // Tentar criar nova instância
+                            $create_result = $whatsapp->createInstance($instance_name);
+                            
+                            if ($create_result['status_code'] == 201 || $create_result['status_code'] == 200) {
+                                error_log("New instance created after deletion, getting QR code");
+                                sleep(2);
                                 
-                                if (strpos($qr_base64, 'data:image') === 0) {
-                                    $qr_code = str_replace('data:image/png;base64,', '', $qr_base64);
+                                $qr_result_new = $whatsapp->getQRCode($instance_name);
+                                
+                                if ($qr_result_new['status_code'] == 200 && isset($qr_result_new['data']['base64'])) {
+                                    $qr_base64 = $qr_result_new['data']['base64'];
+                                    if (strpos($qr_base64, 'data:image') === 0) {
+                                        $qr_code = str_replace('data:image/png;base64,', '', $qr_base64);
+                                    } else {
+                                        $qr_code = $qr_base64;
+                                    }
+                                    $qr_generated = true;
+                                    $temp_message = "Nova instância criada! Escaneie o QR Code para conectar.";
+                                    
+                                    $user->updateWhatsAppInstance($instance_name);
+                                    $_SESSION['whatsapp_instance'] = $instance_name;
+                                    $_SESSION['whatsapp_connected'] = false;
+                                    
                                 } else {
-                                    $qr_code = $qr_base64;
+                                    $temp_error = "Nova instância criada, mas erro ao gerar QR Code. Tente novamente.";
                                 }
-                                
-                                $qr_generated = true;
-                                $temp_message = "QR Code gerado para instância existente! Escaneie com seu WhatsApp para reconectar.";
-                                
-                                // Atualizar usuário no banco (instância existe mas não conectada ainda)
-                                $user->updateWhatsAppInstance($instance_name);
-                                $_SESSION['whatsapp_instance'] = $instance_name;
-                                
                             } else {
-                                $temp_error = "Erro ao obter QR Code da instância existente. Tente novamente.";
+                                $temp_error = "Erro ao recriar instância. Tente novamente em alguns minutos.";
                             }
                         }
-                        
                     } else {
-                        // PASSO 2: Instância não existe, criar nova
+                        // CENÁRIO C: Instância não existe, criar nova
                         error_log("Instance does not exist, creating new instance");
-                        
                         $create_result = $whatsapp->createInstance($instance_name);
                         
                         if ($create_result['status_code'] == 201 || $create_result['status_code'] == 200) {
                             error_log("Instance created successfully, getting QR code");
-                            
-                            // Aguardar um momento para a instância estar pronta
                             sleep(2);
                             
-                            // Obter QR Code da nova instância
                             $qr_result = $whatsapp->getQRCode($instance_name);
                             
                             if ($qr_result['status_code'] == 200 && isset($qr_result['data']['base64'])) {
                                 $qr_base64 = $qr_result['data']['base64'];
-                                
                                 if (strpos($qr_base64, 'data:image') === 0) {
                                     $qr_code = str_replace('data:image/png;base64,', '', $qr_base64);
                                 } else {
                                     $qr_code = $qr_base64;
                                 }
-                                
                                 $qr_generated = true;
-                                $temp_message = "Instância criada com sucesso! Escaneie o QR Code para conectar seu WhatsApp.";
+                                $temp_message = "Instância criada com sucesso! Escaneie o QR Code para conectar.";
                                 
-                                // Atualizar usuário no banco
                                 $user->updateWhatsAppInstance($instance_name);
                                 $_SESSION['whatsapp_instance'] = $instance_name;
+                                $_SESSION['whatsapp_connected'] = false;
                                 
                             } else {
-                                $temp_error = "Instância criada, mas houve erro ao gerar QR Code. Tente novamente.";
+                                $temp_error = "Instância criada, mas erro ao gerar QR Code. Tente novamente.";
                             }
                         } else {
                             $temp_error = "Erro ao criar instância do WhatsApp. Tente novamente.";
@@ -155,66 +182,32 @@ if ($_POST) {
                         }
                     }
                     
-                    // VERIFICAÇÃO FINAL DO STATUS - Esta é a parte crítica da correção
-                    error_log("=== FINAL STATUS CHECK ===");
-                    
-                    // Aguardar um momento para permitir que a conexão seja estabelecida
-                    sleep(1);
-                    
-                    // Verificar o status real da instância
-                    $final_status_result = $whatsapp->getInstanceStatus($instance_name);
-                    $final_connection_state = 'disconnected';
-                    
-                    if ($final_status_result['status_code'] == 200) {
-                        $final_status = $final_status_result['data'];
-                        
-                        if (isset($final_status['instance']['state'])) {
-                            $final_connection_state = $final_status['instance']['state'];
-                        } elseif (isset($final_status['state'])) {
-                            $final_connection_state = $final_status['state'];
-                        }
-                        
-                        error_log("Final connection state: " . $final_connection_state);
-                        
-                        // Se a instância está conectada (open), priorizar mensagem de sucesso
-                        if ($final_connection_state === 'open') {
-                            $message = "WhatsApp conectado com sucesso! Sua automação está funcionando.";
-                            $error = ''; // Limpar qualquer erro anterior
-                            
-                            // Atualizar usuário no banco
-                            $user->updateWhatsAppInstance($instance_name);
-                            $user->updateWhatsAppConnectedStatus(true);
-                            $_SESSION['whatsapp_instance'] = $instance_name;
-                            $_SESSION['whatsapp_connected'] = true;
-                            
-                        } elseif ($final_connection_state === 'connecting' && $qr_generated) {
-                            // Se está conectando e temos QR Code, mostrar mensagem de QR
-                            $message = $temp_message;
-                            $error = ''; // Limpar qualquer erro anterior
-                            
-                            // Atualizar usuário no banco (instância criada mas não conectada ainda)
-                            $user->updateWhatsAppInstance($instance_name);
-                            $_SESSION['whatsapp_instance'] = $instance_name;
-                            
-                        } else {
-                            // Se não está conectado nem conectando, mostrar erro
-                            $error = $temp_error ?: "Erro desconhecido ao conectar WhatsApp.";
-                        }
+                    // Definir mensagens finais
+                    if ($qr_generated) {
+                        $message = $temp_message;
+                        $error = '';
                     } else {
-                        // Se não conseguiu verificar o status, usar as mensagens temporárias
-                        if ($qr_generated) {
-                            $message = $temp_message;
-                            
-                            // Atualizar usuário no banco
-                            $user->updateWhatsAppInstance($instance_name);
-                            $_SESSION['whatsapp_instance'] = $instance_name;
-                        } else {
-                            $error = $temp_error ?: "Erro ao verificar status da conexão.";
+                        $error = $temp_error ?: "Erro desconhecido ao conectar WhatsApp.";
+                    }
+                    
+                    // Verificação final do status para atualizar se conectou durante o processo
+                    $final_status_result = $whatsapp->getInstanceStatus($instance_name);
+                    if ($final_status_result['status_code'] == 200) {
+                        $final_state = null;
+                        if (isset($final_status_result['data']['instance']['state'])) {
+                            $final_state = $final_status_result['data']['instance']['state'];
+                        } elseif (isset($final_status_result['data']['state'])) {
+                            $final_state = $final_status_result['data']['state'];
+                        }
+                        
+                        if ($final_state === 'open') {
+                            $user->updateWhatsAppConnectedStatus(true);
+                            $_SESSION['whatsapp_connected'] = true;
+                            $message = "WhatsApp conectado com sucesso! Sua automação está funcionando.";
+                            $error = '';
                         }
                     }
                     
-                    error_log("Final message: " . $message);
-                    error_log("Final error: " . $error);
                     break;
                     
                 case 'disconnect_whatsapp':

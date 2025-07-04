@@ -24,34 +24,27 @@ require_once 'config/database.php';
                         <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?php echo getSiteName(); ?></h1>
                     </div>
                 </div>
-                <!-- Dark mode toggle -->
-                <div class="flex items-center">
+                <div class="flex items-center space-x-2">
                     <!-- Menu para desktop -->
                     <div class="hidden md:flex items-center space-x-4">
                         <a href="login.php" class="text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-slate-100">Login</a>
                         <a href="register.php" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">Começar Agora</a>
                     </div>
+                    
+                    <!-- Menu para mobile -->
+                    <div class="flex md:hidden items-center space-x-2">
+                        <a href="login.php" class="text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-slate-100 text-sm">Login</a>
+                        <a href="register.php" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">Começar</a>
+                    </div>
+                    
+                    <!-- Dark mode toggle -->
                     <button id="darkModeToggle" class="dark-mode-toggle mr-4" title="Alternar modo escuro">
                         <span class="sr-only">Alternar modo escuro</span>
-                    </button>
-                </div>
-                <!-- Botão do menu mobile -->
-                <div class="flex md:hidden items-center">
-                    <button id="mobile-menu-button" class="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 focus:outline-none">
-                        <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
             </div>
         </nav>
         
-        <!-- Menu mobile -->
-        <div id="mobile-menu" class="mobile-menu">
-            <button id="close-menu-button" class="absolute top-4 right-4 text-white dark:text-slate-200 focus:outline-none">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
-            <a href="login.php" class="hover:bg-blue-700 dark:hover:bg-blue-800">Login</a>
-            <a href="register.php" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 my-2">Começar Agora</a>
-        </div>
     </header>
 
     <!-- Hero Section -->
@@ -357,23 +350,6 @@ require_once 'config/database.php';
                 } else {
                     localStorage.setItem('darkMode', 'disabled');
                 }
-            });
-        });
-        
-        // Script para controlar o menu mobile
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const closeMenuButton = document.getElementById('close-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.add('open');
-                document.body.style.overflow = 'hidden'; // Impedir rolagem
-            });
-            
-            closeMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.remove('open');
-                document.body.style.overflow = ''; // Restaurar rolagem
             });
         });
     </script>

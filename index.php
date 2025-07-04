@@ -31,13 +31,13 @@ require_once 'config/database.php';
                 <div class="flex items-center space-x-2">
                     <!-- Menu para desktop -->
                     <div class="hidden md:flex items-center space-x-4">
-                        <a href="login.php" class="text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-slate-100">Login</a>
+                        <a href="login.php" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Login</a>
                         <a href="register.php" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">Começar Agora</a>
                     </div>
                     
                     <!-- Menu para mobile -->
                     <div class="flex md:hidden items-center space-x-2">
-                        <a href="login.php" class="text-gray-500 hover:text-gray-700 dark:text-slate-300 dark:hover:text-slate-100 text-sm">Login</a>
+                        <a href="login.php" class="bg-gray-200 text-gray-700 px-3 py-1.5 text-sm rounded-md hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Login</a>
                         <a href="register.php" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">Começar</a>
                     </div>
                     

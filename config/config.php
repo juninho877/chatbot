@@ -11,7 +11,6 @@ define('EVOLUTION_API_KEY', '79Bb4lpu2TzxrSMu3SDfSGvB3MIhkur7');
 define('MERCADO_PAGO_ACCESS_TOKEN', 'SEU_ACCESS_TOKEN_AQUI');
 define('MERCADO_PAGO_PUBLIC_KEY', 'SEU_PUBLIC_KEY_AQUI');
 
-// Configurações gerais
 define('SITE_URL', 'https://apiteste.streamingplay.site');
 
 // Configurações de sessão
@@ -21,6 +20,11 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Timezone padrão (pode ser sobrescrito pelas configurações do banco)
 date_default_timezone_set('America/Sao_Paulo');
+
+// Função para obter o nome do site
+function getSiteName() {
+    return getAppSetting('site_name', 'ClientManager Pro');
+}
 
 // Função para obter configurações do banco de dados
 function getAppSetting($key, $default = null) {
@@ -52,7 +56,6 @@ function getAppSetting($key, $default = null) {
 
 // Definir constantes baseadas nas configurações do banco
 define('ADMIN_EMAIL', getAppSetting('admin_email', 'admin@clientmanager.com'));
-define('SITE_NAME', getAppSetting('site_name', 'ClientManager Pro'));
 define('FAVICON_PATH', getAppSetting('favicon_path', '/favicon.ico'));
 
 // Atualizar timezone se configurado no banco

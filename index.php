@@ -7,7 +7,7 @@ require_once 'config/database.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title><?php echo SITE_NAME; ?> - Automatize sua Gestão de Clientes</title>
+    <title><?php echo getSiteName(); ?> - Automatize sua Gestão de Clientes</title>
     <link rel="icon" href="<?php echo FAVICON_PATH; ?>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -21,7 +21,7 @@ require_once 'config/database.php';
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?php echo SITE_NAME; ?></h1>
+                        <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?php echo getSiteName(); ?></h1>
                     </div>
                 </div>
                 <!-- Menu para desktop -->
@@ -293,6 +293,7 @@ require_once 'config/database.php';
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="text-xl font-bold mb-4"><?php echo SITE_NAME; ?></h3>
+                    <h3 class="text-xl font-bold mb-4"><?php echo getSiteName(); ?></h3>
                     <p class="text-gray-400">
                         A solução completa para gestão de clientes com automação via WhatsApp.
                     </p>
@@ -323,7 +324,7 @@ require_once 'config/database.php';
                 </div>
             </div>
             <div class="border-t border-gray-800 dark:border-slate-700 mt-8 pt-8 text-center text-gray-400 dark:text-slate-500">
-                <p>&copy; 2024 <?php echo SITE_NAME; ?>. Todos os direitos reservados.</p>
+                <p>&copy; 2024 <?php echo getSiteName(); ?>. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>

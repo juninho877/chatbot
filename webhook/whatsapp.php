@@ -100,6 +100,10 @@ try {
             handleMessageUpsert($payload, $messageHistory);
             break;
             
+        case 'send.message':
+            handleSendMessage($payload, $messageHistory);
+            break;
+            
         case 'connection.update':
             handleConnectionUpdate($payload);
             break;
@@ -108,8 +112,14 @@ try {
             error_log("Unknown event type: " . $event_type);
             // Tentar processar como atualização de mensagem genérica
             if (isset($payload['data']) && is_array($payload['data'])) {
-                foreach ($payload['data'] as $message_data) {
-                    processMessageStatus($message_data, $messageHistory);
+                // Se data é um array de mensagens
+                if (isset($payload['data'][0])) {
+                    foreach ($payload['data'] as $message_data) {
+                        processMessageStatus($message_data, $messageHistory);
+                    }
+                } else {
+                    // Se data é um objeto único
+                    processMessageStatus($payload['data'], $messageHistory);
                 }
             }
     }
@@ -146,14 +156,13 @@ function cleanWhatsAppMessageId($message_id) {
 function handleMessageUpdate($payload, $messageHistory) {
     error_log("Processing message update");
     
-    if (!isset($payload['data']) || !is_array($payload['data'])) {
-        error_log("No data array in message update payload");
+    if (!isset($payload['data'])) {
+        error_log("No data in message update payload");
         return;
     }
     
-    foreach ($payload['data'] as $message_data) {
-        processMessageStatus($message_data, $messageHistory);
-    }
+    // Para messages.update, data é um objeto único, não um array
+    processMessageStatus($payload['data'], $messageHistory);
 }
 
 /**
@@ -173,6 +182,22 @@ function handleMessageUpsert($payload, $messageHistory) {
 }
 
 /**
+ * Processar evento de envio de mensagem
+ */
+function handleSendMessage($payload, $messageHistory) {
+    error_log("Processing send message event");
+    
+    // Para send.message, apenas logar o evento
+    // O status real será processado no messages.update
+    if (isset($payload['data']['key']['id'])) {
+        $message_id = $payload['data']['key']['id'];
+        error_log("Message sent with ID: " . $message_id);
+    }
+    
+    // Não processar status aqui, pois o messages.update fornecerá o status definitivo
+}
+
+/**
  * Processar atualizações de conexão
  */
 function handleConnectionUpdate($payload) {
@@ -188,27 +213,40 @@ function handleConnectionUpdate($payload) {
  */
 function processMessageStatus($message_data, $messageHistory) {
     try {
-        // Extrair informações da mensagem
-        $raw_message_id = $message_data['key']['id'] ?? null;
-        $status = null;
+        // PRIORIZAR keyId para messages.update, depois key.id para outros eventos
+        $raw_message_id = null;
+        
+        if (isset($message_data['keyId'])) {
+            // Para messages.update events
+            $raw_message_id = $message_data['keyId'];
+            error_log("Using keyId from messages.update: " . $raw_message_id);
+        } elseif (isset($message_data['key']['id'])) {
+            // Para outros tipos de eventos
+            $raw_message_id = $message_data['key']['id'];
+            error_log("Using key.id from other events: " . $raw_message_id);
+        }
+        
+        if (!$raw_message_id) {
+            error_log("No message ID found in webhook data");
+            error_log("Available keys: " . implode(', ', array_keys($message_data)));
+            return;
+        }
         
         // Limpar o ID da mensagem removendo sufixos
         $message_id = cleanWhatsAppMessageId($raw_message_id);
         
         // Determinar o status baseado nos dados recebidos
+        $status = null;
+        
         if (isset($message_data['status'])) {
             $status = mapWhatsAppStatus($message_data['status']);
         } elseif (isset($message_data['messageTimestamp'])) {
             $status = 'delivered';
         }
         
-        if (!$message_id) {
-            error_log("No message ID found in webhook data");
-            return;
-        }
-        
         if (!$status) {
             error_log("No valid status found in webhook data");
+            error_log("Available status fields: " . json_encode(array_keys($message_data)));
             return;
         }
         
@@ -269,12 +307,17 @@ function mapWhatsAppStatus($whatsapp_status) {
         'PENDING' => 'sent',
         'SENT' => 'sent',
         'DELIVERED' => 'delivered',
+        'DELIVERY_ACK' => 'delivered',  // Adicionado para Evolution API v2
         'READ' => 'read',
+        'READ_ACK' => 'read',           // Adicionado para Evolution API v2
         'FAILED' => 'failed',
         'ERROR' => 'failed'
     ];
     
-    return $status_map[strtoupper($whatsapp_status)] ?? null;
+    $mapped_status = $status_map[strtoupper($whatsapp_status)] ?? null;
+    error_log("Mapping WhatsApp status '$whatsapp_status' to '$mapped_status'");
+    
+    return $mapped_status;
 }
 
 /**
@@ -294,7 +337,11 @@ function shouldUpdateStatus($current_status, $new_status) {
     // Permitir atualização se:
     // 1. O novo status é "failed" (pode acontecer a qualquer momento)
     // 2. O novo status tem nível maior que o atual
-    return $new_status === 'failed' || $new_level > $current_level;
+    $should_update = $new_status === 'failed' || $new_level > $current_level;
+    
+    error_log("Status update check: '$current_status' (level $current_level) -> '$new_status' (level $new_level) = " . ($should_update ? 'ALLOW' : 'SKIP'));
+    
+    return $should_update;
 }
 
 /**

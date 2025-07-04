@@ -29,6 +29,17 @@ if ($_POST) {
                     $client->address = trim($_POST['address']);
                     $client->status = $_POST['status'];
                     $client->notes = trim($_POST['notes']);
+                    $client->subscription_amount = !empty($_POST['subscription_amount']) ? floatval($_POST['subscription_amount']) : null;
+                    $client->due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : null;
+                    $client->last_payment_date = !empty($_POST['last_payment_date']) ? $_POST['last_payment_date'] : null;
+                    $client->next_payment_date = !empty($_POST['next_payment_date']) ? $_POST['next_payment_date'] : null;
+                    
+                    // Validar dados
+                    $validation_errors = $client->validate();
+                    if (!empty($validation_errors)) {
+                        $error = implode(', ', $validation_errors);
+                        break;
+                    }
                     
                     if ($client->create()) {
                         $message = "Cliente adicionado com sucesso!";
@@ -47,6 +58,17 @@ if ($_POST) {
                     $client->address = trim($_POST['address']);
                     $client->status = $_POST['status'];
                     $client->notes = trim($_POST['notes']);
+                    $client->subscription_amount = !empty($_POST['subscription_amount']) ? floatval($_POST['subscription_amount']) : null;
+                    $client->due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : null;
+                    $client->last_payment_date = !empty($_POST['last_payment_date']) ? $_POST['last_payment_date'] : null;
+                    $client->next_payment_date = !empty($_POST['next_payment_date']) ? $_POST['next_payment_date'] : null;
+                    
+                    // Validar dados
+                    $validation_errors = $client->validate();
+                    if (!empty($validation_errors)) {
+                        $error = implode(', ', $validation_errors);
+                        break;
+                    }
                     
                     if ($client->update()) {
                         $message = "Cliente atualizado com sucesso!";
@@ -63,6 +85,21 @@ if ($_POST) {
                         $message = "Cliente removido com sucesso!";
                     } else {
                         $error = "Erro ao remover cliente.";
+                    }
+                    break;
+                    
+                case 'mark_payment':
+                    $client->id = $_POST['id'];
+                    $client->user_id = $_SESSION['user_id'];
+                    
+                    if ($client->readOne()) {
+                        if ($client->markPaymentReceived()) {
+                            $message = "Pagamento marcado como recebido!";
+                        } else {
+                            $error = "Erro ao marcar pagamento.";
+                        }
+                    } else {
+                        $error = "Cliente não encontrado.";
                     }
                     break;
             }
@@ -196,10 +233,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                         <table class="min-w-full divide-y divide-gray-200">
                                             <thead class="bg-gray-50">
                                                 <tr>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Nome</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
                                                     <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Contato</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Assinatura</th>
+                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Vencimento</th>
                                                     <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Cadastrado</th>
                                                     <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
                                                 </tr>
                                             </thead>
@@ -221,6 +259,38 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
+                                                        <?php if ($client_row['subscription_amount']): ?>
+                                                            <div class="text-sm font-medium text-gray-900">R$ <?php echo number_format($client_row['subscription_amount'], 2, ',', '.'); ?></div>
+                                                            <?php if ($client_row['last_payment_date']): ?>
+                                                                <div class="text-xs text-gray-500">Último: <?php echo date('d/m/Y', strtotime($client_row['last_payment_date'])); ?></div>
+                                                            <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <span class="text-sm text-gray-400">Não definido</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <?php if ($client_row['due_date']): ?>
+                                                            <?php 
+                                                            $due_date = new DateTime($client_row['due_date']);
+                                                            $today = new DateTime();
+                                                            $diff = $today->diff($due_date);
+                                                            $days_diff = $diff->invert ? -$diff->days : $diff->days;
+                                                            ?>
+                                                            <div class="text-sm text-gray-900"><?php echo $due_date->format('d/m/Y'); ?></div>
+                                                            <?php if ($days_diff < 0): ?>
+                                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                                                    <?php echo abs($days_diff); ?> dias em atraso
+                                                                </span>
+                                                            <?php elseif ($days_diff <= 3): ?>
+                                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                                    Vence em <?php echo $days_diff; ?> dias
+                                                                </span>
+                                                            <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <span class="text-sm text-gray-400">Não definido</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
                                                         <?php if ($client_row['status'] == 'active'): ?>
                                                             <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-200 text-green-800">Ativo</span>
                                                         <?php elseif ($client_row['status'] == 'inactive'): ?>
@@ -229,10 +299,14 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                             <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-200 text-yellow-800">Pendente</span>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        <?php echo date('d/m/Y', strtotime($client_row['created_at'])); ?>
-                                                    </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        <?php if ($client_row['subscription_amount']): ?>
+                                                            <button onclick="markPayment(<?php echo $client_row['id']; ?>, '<?php echo htmlspecialchars($client_row['name']); ?>')" 
+                                                                    class="text-green-600 hover:text-green-900 mr-3 p-2 rounded-full hover:bg-gray-200 transition duration-150" 
+                                                                    title="Marcar pagamento como recebido">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </button>
+                                                        <?php endif; ?>
                                                         <button onclick="editClient(<?php echo htmlspecialchars(json_encode($client_row)); ?>)" class="text-blue-600 hover:text-blue-900 mr-3 p-2 rounded-full hover:bg-gray-200 transition duration-150">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
@@ -256,52 +330,90 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 
     <!-- Modal para adicionar/editar cliente -->
     <div id="clientModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-6 border max-w-lg shadow-lg rounded-md bg-white border-t-4 border-blue-600">
+        <div class="relative top-10 mx-auto p-6 border max-w-2xl shadow-lg rounded-md bg-white border-t-4 border-blue-600">
             <div class="mt-3">
                 <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modalTitle">Adicionar Cliente</h3>
                 <form id="clientForm" method="POST">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="clientId">
                     
-                    <div class="space-y-4">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nome *</label>
-                            <input type="text" name="name" id="name" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Informações Básicas -->
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Informações Básicas</h4>
+                            
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700">Nome *</label>
+                                <input type="text" name="name" id="name" required 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" name="email" id="email" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700">Telefone/WhatsApp *</label>
+                                <input type="tel" name="phone" id="phone" required 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="document" class="block text-sm font-medium text-gray-700">CPF/CNPJ</label>
+                                <input type="text" name="document" id="document" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select name="status" id="status" 
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                                    <option value="active">Ativo</option>
+                                    <option value="inactive">Inativo</option>
+                                    <option value="pending">Pendente</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email" 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                        <!-- Informações de Assinatura -->
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-medium text-gray-900 border-b pb-2">Assinatura e Pagamentos</h4>
+                            
+                            <div>
+                                <label for="subscription_amount" class="block text-sm font-medium text-gray-700">Valor da Assinatura (R$)</label>
+                                <input type="number" name="subscription_amount" id="subscription_amount" step="0.01" min="0"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                       placeholder="0,00">
+                            </div>
+                            
+                            <div>
+                                <label for="due_date" class="block text-sm font-medium text-gray-700">Data de Vencimento</label>
+                                <input type="date" name="due_date" id="due_date" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="last_payment_date" class="block text-sm font-medium text-gray-700">Último Pagamento</label>
+                                <input type="date" name="last_payment_date" id="last_payment_date" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label for="next_payment_date" class="block text-sm font-medium text-gray-700">Próximo Pagamento</label>
+                                <input type="date" name="next_payment_date" id="next_payment_date" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                            </div>
                         </div>
-                        
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Telefone/WhatsApp *</label>
-                            <input type="tel" name="phone" id="phone" required 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                        </div>
-                        
-                        <div>
-                            <label for="document" class="block text-sm font-medium text-gray-700">CPF/CNPJ</label>
-                            <input type="text" name="document" id="document" 
-                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                        </div>
-                        
+                    </div>
+                    
+                    <!-- Campos que ocupam toda a largura -->
+                    <div class="mt-4 space-y-4">
                         <div>
                             <label for="address" class="block text-sm font-medium text-gray-700">Endereço</label>
                             <textarea name="address" id="address" rows="2" 
                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"></textarea>
-                        </div>
-                        
-                        <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                            <select name="status" id="status" 
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                                <option value="active">Ativo</option>
-                                <option value="inactive">Inativo</option>
-                                <option value="pending">Pendente</option>
-                            </select>
                         </div>
                         
                         <div>
@@ -348,6 +460,10 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             document.getElementById('address').value = client.address || '';
             document.getElementById('status').value = client.status;
             document.getElementById('notes').value = client.notes || '';
+            document.getElementById('subscription_amount').value = client.subscription_amount || '';
+            document.getElementById('due_date').value = client.due_date || '';
+            document.getElementById('last_payment_date').value = client.last_payment_date || '';
+            document.getElementById('next_payment_date').value = client.next_payment_date || '';
         }
 
         function deleteClient(id, name) {
@@ -363,10 +479,79 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             }
         }
 
+        function markPayment(id, name) {
+            if (confirm('Marcar pagamento como recebido para "' + name + '"?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `
+                    <input type="hidden" name="action" value="mark_payment">
+                    <input type="hidden" name="id" value="${id}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
         // Fechar modal ao clicar fora
         document.getElementById('clientModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // Validação do formulário
+        document.getElementById('clientForm').addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subscriptionAmount = document.getElementById('subscription_amount').value;
+            
+            if (!name) {
+                alert('Nome é obrigatório');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!phone) {
+                alert('Telefone é obrigatório');
+                e.preventDefault();
+                return;
+            }
+            
+            if (email && !isValidEmail(email)) {
+                alert('Email inválido');
+                e.preventDefault();
+                return;
+            }
+            
+            if (subscriptionAmount && (isNaN(subscriptionAmount) || parseFloat(subscriptionAmount) <= 0)) {
+                alert('Valor da assinatura deve ser um número positivo');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Auto-calcular próximo pagamento quando definir último pagamento
+        document.getElementById('last_payment_date').addEventListener('change', function() {
+            const lastPaymentDate = new Date(this.value);
+            if (lastPaymentDate) {
+                const nextPaymentDate = new Date(lastPaymentDate);
+                nextPaymentDate.setDate(nextPaymentDate.getDate() + 30);
+                
+                const nextPaymentInput = document.getElementById('next_payment_date');
+                const dueDateInput = document.getElementById('due_date');
+                
+                const formattedDate = nextPaymentDate.toISOString().split('T')[0];
+                nextPaymentInput.value = formattedDate;
+                
+                if (!dueDateInput.value) {
+                    dueDateInput.value = formattedDate;
+                }
             }
         });
     </script>

@@ -120,6 +120,29 @@ class User {
         return $stmt->execute();
     }
 
+    public function updateWhatsAppConnectedStatus($connected) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET whatsapp_connected=:connected 
+                  WHERE id=:id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":connected", $connected, PDO::PARAM_BOOL);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+
+    public function disconnectWhatsAppInstance() {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET whatsapp_instance=NULL, whatsapp_connected=0 
+                  WHERE id=:id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+
     public function isAdmin() {
         return $this->role === 'admin';
     }
@@ -130,6 +153,23 @@ class User {
         $stmt->bindParam(':role', $new_role);
         $stmt->bindParam(':id', $user_id);
         return $stmt->execute();
+    }
+
+    // Função para sanitizar nome de usuário para uso como nome de instância
+    public function sanitizeInstanceName($name) {
+        // Remover acentos e caracteres especiais
+        $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+        // Converter para minúsculas
+        $name = strtolower($name);
+        // Remover espaços e caracteres não alfanuméricos
+        $name = preg_replace('/[^a-z0-9]/', '', $name);
+        // Limitar a 20 caracteres
+        $name = substr($name, 0, 20);
+        // Garantir que não está vazio
+        if (empty($name)) {
+            $name = 'user' . $this->id;
+        }
+        return 'cm_' . $name;
     }
 }
 ?>

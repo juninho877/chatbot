@@ -15,6 +15,9 @@ $client = new Client($db);
 $message = '';
 $error = '';
 
+// Verificar se é administrador usando role
+$is_admin = ($_SESSION['user_role'] === 'admin');
+
 // Processar ações
 if ($_POST) {
     try {
@@ -166,6 +169,13 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <i class="fas fa-chart-bar mr-3"></i>
                             Relatórios
                         </a>
+                        <?php if ($is_admin): ?>
+                        <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            <i class="fas fa-cog mr-3"></i>
+                            Configurações
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
+                        </a>
+                        <?php endif; ?>
                     </nav>
                 </div>
                 <div class="flex-shrink-0 flex border-t border-gray-700 p-4">
@@ -173,7 +183,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <div class="flex items-center">
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-200"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white">Sair</a>
+                                <?php if ($is_admin): ?>
+                                    <span class="text-xs font-medium text-yellow-400">Administrador</span>
+                                <?php else: ?>
+                                    <span class="text-xs font-medium text-gray-400">Usuário</span>
+                                <?php endif; ?>
+                                <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
                             </div>
                         </div>
                     </div>

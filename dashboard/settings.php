@@ -8,8 +8,8 @@ if (!isset($_SESSION['user_id'])) {
     redirect("../login.php");
 }
 
-// Verificar se é administrador (apenas admin@clientmanager.com pode acessar)
-if ($_SESSION['user_email'] !== 'admin@clientmanager.com') {
+// Verificar se é administrador usando role
+if ($_SESSION['user_role'] !== 'admin') {
     // Redirecionar para dashboard com mensagem de erro
     $_SESSION['error_message'] = 'Acesso negado. Apenas administradores podem acessar as configurações do sistema.';
     redirect("index.php");

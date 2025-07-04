@@ -66,6 +66,7 @@ if ($_POST) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="dashboard/css/dark_mode.css" rel="stylesheet">
+    <link href="dashboard/css/dark_mode.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 min-h-screen">
     <div class="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
@@ -135,16 +136,22 @@ if ($_POST) {
                         </a>
                     </div>
                 </form>
-                
-                <!-- Credenciais de teste -->
-                <div class="mt-6 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Credenciais de teste:</h4>
-                    <p class="text-xs text-gray-600 dark:text-slate-400">Email: admin@clientmanager.com</p>
-                    <p class="text-xs text-gray-600 dark:text-slate-400">Senha: 102030</p>
-                </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        // Dark Mode Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved dark mode preference or default to light mode
+            const savedTheme = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'enabled' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        });
+    </script>
     
     <script>
         // Dark Mode Toggle Functionality

@@ -16,11 +16,13 @@ if ($_POST) {
     $user->password = $_POST['password'];
     $user->phone = $_POST['phone'];
     $user->plan_id = $_POST['plan_id'];
+    $user->role = 'user'; // Novos usuários sempre começam como 'user'
     
     if ($user->create()) {
         $_SESSION['user_id'] = $user->id;
         $_SESSION['user_name'] = $user->name;
         $_SESSION['user_email'] = $user->email;
+        $_SESSION['user_role'] = $user->role;
         $_SESSION['plan_id'] = $user->plan_id;
         
         header("Location: payment.php?plan_id=" . $user->plan_id);

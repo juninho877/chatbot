@@ -11,6 +11,7 @@ class User {
     public $password;
     public $phone;
     public $plan_id;
+    public $role;
     public $whatsapp_instance;
     public $whatsapp_connected;
 
@@ -20,17 +21,23 @@ class User {
 
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " 
-                  SET name=:name, email=:email, password=:password, phone=:phone, plan_id=:plan_id";
+                  SET name=:name, email=:email, password=:password, phone=:phone, plan_id=:plan_id, role=:role";
         
         $stmt = $this->conn->prepare($query);
         
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        
+        // Definir role padrão como 'user' se não especificado
+        if (empty($this->role)) {
+            $this->role = 'user';
+        }
         
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":phone", $this->phone);
         $stmt->bindParam(":plan_id", $this->plan_id);
+        $stmt->bindParam(":role", $this->role);
         
         if($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
@@ -45,7 +52,7 @@ class User {
         error_log("Attempting login for email: " . $email);
         error_log("Provided password: " . $password);
         
-        $query = "SELECT id, name, email, password, plan_id, whatsapp_instance, whatsapp_connected 
+        $query = "SELECT id, name, email, password, plan_id, role, whatsapp_instance, whatsapp_connected 
                   FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
         
         $stmt = $this->conn->prepare($query);
@@ -69,9 +76,10 @@ class User {
                 $this->name = $row['name'];
                 $this->email = $row['email'];
                 $this->plan_id = $row['plan_id'];
+                $this->role = $row['role'] ?? 'user'; // Fallback para compatibilidade
                 $this->whatsapp_instance = $row['whatsapp_instance'];
                 $this->whatsapp_connected = $row['whatsapp_connected'];
-                error_log("Login successful for user ID: " . $this->id);
+                error_log("Login successful for user ID: " . $this->id . ", Role: " . $this->role);
                 return true;
             } else {
                 error_log("Password verification failed");
@@ -90,7 +98,7 @@ class User {
     }
 
     public function readAll() {
-        $query = "SELECT id, name, email, plan_id, whatsapp_instance, whatsapp_connected 
+        $query = "SELECT id, name, email, plan_id, role, whatsapp_instance, whatsapp_connected 
                   FROM " . $this->table_name . " 
                   WHERE whatsapp_instance IS NOT NULL AND whatsapp_connected = 1
                   ORDER BY id ASC";
@@ -109,6 +117,18 @@ class User {
         $stmt->bindParam(":instance", $instance_name);
         $stmt->bindParam(":id", $this->id);
         
+        return $stmt->execute();
+    }
+
+    public function isAdmin() {
+        return $this->role === 'admin';
+    }
+
+    public function updateRole($user_id, $new_role) {
+        $query = "UPDATE " . $this->table_name . " SET role = :role WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':role', $new_role);
+        $stmt->bindParam(':id', $user_id);
         return $stmt->execute();
     }
 }

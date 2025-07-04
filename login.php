@@ -28,6 +28,7 @@ if ($_POST) {
             $_SESSION['user_id'] = $user->id;
             $_SESSION['user_name'] = $user->name;
             $_SESSION['user_email'] = $user->email;
+            $_SESSION['user_role'] = $user->role; // Armazenar role na sessão
             $_SESSION['plan_id'] = $user->plan_id;
             $_SESSION['whatsapp_instance'] = $user->whatsapp_instance;
             $_SESSION['whatsapp_connected'] = $user->whatsapp_connected;

@@ -35,8 +35,8 @@ $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $messages_today = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Verificar se é administrador (email admin@clientmanager.com)
-$is_admin = ($_SESSION['user_email'] === 'admin@clientmanager.com');
+// Verificar se é administrador usando role
+$is_admin = ($_SESSION['user_role'] === 'admin');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -85,6 +85,7 @@ $is_admin = ($_SESSION['user_email'] === 'admin@clientmanager.com');
                         <a href="settings.php" class="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             <i class="fas fa-cog mr-3"></i>
                             Configurações
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">Admin</span>
                         </a>
                         <?php endif; ?>
                     </nav>
@@ -96,6 +97,8 @@ $is_admin = ($_SESSION['user_email'] === 'admin@clientmanager.com');
                                 <p class="text-sm font-medium text-gray-200"><?php echo $_SESSION['user_name']; ?></p>
                                 <?php if ($is_admin): ?>
                                     <span class="text-xs font-medium text-yellow-400">Administrador</span>
+                                <?php else: ?>
+                                    <span class="text-xs font-medium text-gray-400">Usuário</span>
                                 <?php endif; ?>
                                 <a href="../logout.php" class="text-xs font-medium text-gray-400 hover:text-white block">Sair</a>
                             </div>
@@ -233,6 +236,26 @@ $is_admin = ($_SESSION['user_email'] === 'admin@clientmanager.com');
                                             <strong>WhatsApp não conectado!</strong>
                                             Para enviar mensagens automáticas, você precisa conectar seu WhatsApp.
                                             <a href="whatsapp.php" class="font-medium underline">Conectar agora</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if ($is_admin): ?>
+                        <!-- Admin Panel -->
+                        <div class="mt-8">
+                            <div class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-shield-alt text-blue-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-blue-800">
+                                            <strong>Painel Administrativo:</strong>
+                                            Você tem acesso às configurações avançadas do sistema.
+                                            <a href="settings.php" class="font-medium underline">Acessar configurações</a>
                                         </p>
                                     </div>
                                 </div>

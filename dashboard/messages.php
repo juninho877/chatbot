@@ -36,8 +36,20 @@ if (isset($_SESSION['user_role'])) {
     }
 }
 
+// Inicializar variáveis de mensagem
 $message = '';
 $error = '';
+
+// Verificar se há mensagens na sessão (vindas de redirect)
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // Limpar da sessão após usar
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']); // Limpar da sessão após usar
+}
 
 /**
  * Função para limpar ID da mensagem do WhatsApp removendo sufixos
@@ -70,8 +82,8 @@ if ($_POST) {
                     $client->user_id = $_SESSION['user_id'];
                     
                     if (!$client->readOne()) {
-                        $error = "Cliente não encontrado.";
-                        break;
+                        $_SESSION['error'] = "Cliente não encontrado.";
+                        redirect("messages.php");
                     }
                     
                     // Determinar mensagem a ser enviada
@@ -92,15 +104,15 @@ if ($_POST) {
                     }
                     
                     if (empty($message_text)) {
-                        $error = "Mensagem não pode estar vazia.";
-                        break;
+                        $_SESSION['error'] = "Mensagem não pode estar vazia.";
+                        redirect("messages.php");
                     }
                     
                     // Verificar se WhatsApp está conectado
                     $instance_name = $_SESSION['whatsapp_instance'];
                     if (!$instance_name || !$whatsapp->isInstanceConnected($instance_name)) {
-                        $error = "WhatsApp não está conectado. Configure a conexão primeiro.";
-                        break;
+                        $_SESSION['error'] = "WhatsApp não está conectado. Configure a conexão primeiro.";
+                        redirect("messages.php");
                     }
                     
                     // Enviar mensagem
@@ -125,13 +137,16 @@ if ($_POST) {
                     
                     if ($messageHistory->create()) {
                         if ($messageHistory->status == 'sent') {
-                            $message = "Mensagem enviada com sucesso para " . $client->name . "!";
+                            $_SESSION['message'] = "Mensagem enviada com sucesso para " . $client->name . "!";
                         } else {
-                            $error = "Mensagem registrada, mas houve erro no envio: " . ($result['data']['message'] ?? 'Erro desconhecido');
+                            $_SESSION['error'] = "Mensagem registrada, mas houve erro no envio: " . ($result['data']['message'] ?? 'Erro desconhecido');
                         }
                     } else {
-                        $error = "Erro ao registrar mensagem no histórico.";
+                        $_SESSION['error'] = "Erro ao registrar mensagem no histórico.";
                     }
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("messages.php");
                     break;
                     
                 case 'send_bulk':
@@ -139,28 +154,28 @@ if ($_POST) {
                     $template_id = $_POST['bulk_template_id'];
                     
                     if (empty($selected_clients)) {
-                        $error = "Selecione pelo menos um cliente.";
-                        break;
+                        $_SESSION['error'] = "Selecione pelo menos um cliente.";
+                        redirect("messages.php");
                     }
                     
                     if (empty($template_id)) {
-                        $error = "Selecione um template.";
-                        break;
+                        $_SESSION['error'] = "Selecione um template.";
+                        redirect("messages.php");
                     }
                     
                     // Buscar template
                     $template->id = $template_id;
                     $template->user_id = $_SESSION['user_id'];
                     if (!$template->readOne()) {
-                        $error = "Template não encontrado.";
-                        break;
+                        $_SESSION['error'] = "Template não encontrado.";
+                        redirect("messages.php");
                     }
                     
                     // Verificar se WhatsApp está conectado
                     $instance_name = $_SESSION['whatsapp_instance'];
                     if (!$instance_name || !$whatsapp->isInstanceConnected($instance_name)) {
-                        $error = "WhatsApp não está conectado. Configure a conexão primeiro.";
-                        break;
+                        $_SESSION['error'] = "WhatsApp não está conectado. Configure a conexão primeiro.";
+                        redirect("messages.php");
                     }
                     
                     $sent_count = 0;
@@ -210,12 +225,16 @@ if ($_POST) {
                         }
                     }
                     
-                    $message = "Envio em lote concluído! Enviadas: $sent_count, Falharam: $failed_count";
+                    $_SESSION['message'] = "Envio em lote concluído! Enviadas: $sent_count, Falharam: $failed_count";
+                    
+                    // Redirecionar para evitar reenvio
+                    redirect("messages.php");
                     break;
             }
         }
     } catch (Exception $e) {
-        $error = "Erro: " . $e->getMessage();
+        $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("messages.php");
     }
 }
 

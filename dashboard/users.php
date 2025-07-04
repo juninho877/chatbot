@@ -101,19 +101,57 @@ if ($_POST) {
                     }
                     
                     // Atualizar usuário
-                    $query = "UPDATE users SET name=:name, email=:email, phone=:phone, plan_id=:plan_id, role=:role WHERE id=:id";
-                    $stmt = $db->prepare($query);
-                    $stmt->bindParam(':name', $user->name);
-                    $stmt->bindParam(':email', $user->email);
-                    $stmt->bindParam(':phone', $user->phone);
-                    $stmt->bindParam(':plan_id', $user->plan_id);
-                    $stmt->bindParam(':role', $user->role);
-                    $stmt->bindParam(':id', $user->id);
-                    
-                    if ($stmt->execute()) {
+                    if ($user->update()) {
                         $message = "Usuário atualizado com sucesso!";
                     } else {
                         $error = "Erro ao atualizar usuário.";
+                    }
+                    break;
+                    
+                case 'update_subscription':
+                    $user_id = $_POST['id'];
+                    
+                    $subscription_data = [
+                        'subscription_status' => $_POST['subscription_status'],
+                        'trial_starts_at' => !empty($_POST['trial_starts_at']) ? $_POST['trial_starts_at'] : null,
+                        'trial_ends_at' => !empty($_POST['trial_ends_at']) ? $_POST['trial_ends_at'] : null,
+                        'plan_expires_at' => !empty($_POST['plan_expires_at']) ? $_POST['plan_expires_at'] : null,
+                        'plan_id' => $_POST['plan_id']
+                    ];
+                    
+                    // Validações específicas para assinatura
+                    if ($subscription_data['subscription_status'] === 'trial') {
+                        if (empty($subscription_data['trial_starts_at']) || empty($subscription_data['trial_ends_at'])) {
+                            $error = "Para status 'trial', as datas de início e fim do teste são obrigatórias.";
+                            break;
+                        }
+                    }
+                    
+                    if ($subscription_data['subscription_status'] === 'active') {
+                        if (empty($subscription_data['plan_expires_at'])) {
+                            $error = "Para status 'active', a data de expiração do plano é obrigatória.";
+                            break;
+                        }
+                    }
+                    
+                    if ($user->updateSubscriptionDetails($user_id, $subscription_data)) {
+                        $message = "Detalhes da assinatura atualizados com sucesso!";
+                    } else {
+                        $error = "Erro ao atualizar detalhes da assinatura.";
+                    }
+                    break;
+                    
+                case 'renew_plan':
+                    $user_id = $_POST['id'];
+                    $days = intval($_POST['days'] ?? 30);
+                    
+                    $user_obj = new User($db);
+                    $user_obj->id = $user_id;
+                    
+                    if ($user_obj->renewPlan($days)) {
+                        $message = "Plano renovado por $days dias com sucesso!";
+                    } else {
+                        $error = "Erro ao renovar plano.";
                     }
                     break;
                     
@@ -172,7 +210,7 @@ if ($_POST) {
     }
 }
 
-// Buscar todos os usuários
+// Buscar todos os usuários com informações de plano
 $query = "SELECT u.*, p.name as plan_name, p.price as plan_price 
           FROM users u 
           LEFT JOIN plans p ON u.plan_id = p.id 
@@ -218,7 +256,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         <div class="flex justify-between items-center">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Gerenciar Usuários</h1>
-                                <p class="mt-1 text-sm text-gray-600">Administre todos os usuários do sistema</p>
+                                <p class="mt-1 text-sm text-gray-600">Administre todos os usuários do sistema e suas assinaturas</p>
                             </div>
                             <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md hover:shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
@@ -256,7 +294,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                             <tr>
                                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Usuário</th>
                                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Plano</th>
-                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status Assinatura</th>
+                                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Expiração Plano</th>
                                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">WhatsApp</th>
                                                 <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
                                             </tr>
@@ -306,14 +345,29 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                         case 'expired':
                                                             echo '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Expirado</span>';
                                                             break;
+                                                        case 'cancelled':
+                                                            echo '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Cancelado</span>';
+                                                            break;
                                                         default:
                                                             echo '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Desconhecido</span>';
                                                     }
                                                     ?>
-                                                    <?php if ($user_row['trial_ends_at'] && $status === 'trial'): ?>
-                                                        <div class="text-xs text-gray-500 mt-1">
-                                                            Expira: <?php echo date('d/m/Y', strtotime($user_row['trial_ends_at'])); ?>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <?php if ($user_row['role'] === 'admin'): ?>
+                                                        <span class="text-sm text-green-600 font-medium">Sem expiração</span>
+                                                    <?php elseif ($status === 'trial' && $user_row['trial_ends_at']): ?>
+                                                        <div class="text-sm text-gray-900">
+                                                            <?php echo date('d/m/Y H:i', strtotime($user_row['trial_ends_at'])); ?>
                                                         </div>
+                                                        <div class="text-xs text-yellow-600">Teste expira</div>
+                                                    <?php elseif ($user_row['plan_expires_at']): ?>
+                                                        <div class="text-sm text-gray-900">
+                                                            <?php echo date('d/m/Y H:i', strtotime($user_row['plan_expires_at'])); ?>
+                                                        </div>
+                                                        <div class="text-xs text-gray-500">Plano expira</div>
+                                                    <?php else: ?>
+                                                        <span class="text-sm text-gray-400">Não definido</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -331,16 +385,29 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <button onclick="editUser(<?php echo htmlspecialchars(json_encode($user_row)); ?>)" 
-                                                            class="text-blue-600 hover:text-blue-900 mr-3 p-2 rounded-full hover:bg-gray-200 transition duration-150">
+                                                            class="text-blue-600 hover:text-blue-900 mr-2 p-2 rounded-full hover:bg-gray-200 transition duration-150"
+                                                            title="Editar usuário">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+                                                    <button onclick="editSubscription(<?php echo htmlspecialchars(json_encode($user_row)); ?>)" 
+                                                            class="text-purple-600 hover:text-purple-900 mr-2 p-2 rounded-full hover:bg-gray-200 transition duration-150"
+                                                            title="Gerenciar assinatura">
+                                                        <i class="fas fa-credit-card"></i>
+                                                    </button>
+                                                    <button onclick="renewPlan(<?php echo $user_row['id']; ?>, '<?php echo htmlspecialchars($user_row['name']); ?>')" 
+                                                            class="text-green-600 hover:text-green-900 mr-2 p-2 rounded-full hover:bg-gray-200 transition duration-150"
+                                                            title="Renovar plano">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                    </button>
                                                     <button onclick="resetPassword(<?php echo $user_row['id']; ?>, '<?php echo htmlspecialchars($user_row['name']); ?>')" 
-                                                            class="text-yellow-600 hover:text-yellow-900 mr-3 p-2 rounded-full hover:bg-gray-200 transition duration-150">
+                                                            class="text-yellow-600 hover:text-yellow-900 mr-2 p-2 rounded-full hover:bg-gray-200 transition duration-150"
+                                                            title="Redefinir senha">
                                                         <i class="fas fa-key"></i>
                                                     </button>
                                                     <?php if ($user_row['id'] != 1 && $user_row['id'] != $_SESSION['user_id']): ?>
                                                         <button onclick="deleteUser(<?php echo $user_row['id']; ?>, '<?php echo htmlspecialchars($user_row['name']); ?>')" 
-                                                                class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-gray-200 transition duration-150">
+                                                                class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-gray-200 transition duration-150"
+                                                                title="Deletar usuário">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     <?php endif; ?>
@@ -430,6 +497,108 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         </div>
     </div>
 
+    <!-- Modal para gerenciar assinatura -->
+    <div id="subscriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-6 border max-w-3xl shadow-lg rounded-md bg-white border-t-4 border-purple-600">
+            <div class="mt-3">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Gerenciar Assinatura</h3>
+                <form id="subscriptionForm" method="POST">
+                    <input type="hidden" name="action" value="update_subscription">
+                    <input type="hidden" name="id" id="subscriptionUserId">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="subscription_status" class="block text-sm font-medium text-gray-700">Status da Assinatura *</label>
+                            <select name="subscription_status" id="subscription_status" required 
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5"
+                                    onchange="toggleDateFields()">
+                                <option value="trial">Período de Teste</option>
+                                <option value="active">Ativo</option>
+                                <option value="expired">Expirado</option>
+                                <option value="cancelled">Cancelado</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="subscription_plan_id" class="block text-sm font-medium text-gray-700">Plano *</label>
+                            <select name="plan_id" id="subscription_plan_id" required 
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
+                                <?php foreach ($plans as $plan_row): ?>
+                                    <option value="<?php echo $plan_row['id']; ?>">
+                                        <?php echo htmlspecialchars($plan_row['name']); ?> - R$ <?php echo number_format($plan_row['price'], 2, ',', '.'); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div id="trialStartField">
+                            <label for="trial_starts_at" class="block text-sm font-medium text-gray-700">Início do Teste</label>
+                            <input type="datetime-local" name="trial_starts_at" id="trial_starts_at" 
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
+                        </div>
+                        
+                        <div id="trialEndField">
+                            <label for="trial_ends_at" class="block text-sm font-medium text-gray-700">Fim do Teste</label>
+                            <input type="datetime-local" name="trial_ends_at" id="trial_ends_at" 
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
+                        </div>
+                        
+                        <div id="planExpiryField" class="md:col-span-2">
+                            <label for="plan_expires_at" class="block text-sm font-medium text-gray-700">Expiração do Plano</label>
+                            <input type="datetime-local" name="plan_expires_at" id="plan_expires_at" 
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeSubscriptionModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition duration-150">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition duration-150 shadow-md">
+                            Atualizar Assinatura
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para renovar plano -->
+    <div id="renewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-6 border max-w-md shadow-lg rounded-md bg-white border-t-4 border-green-600">
+            <div class="mt-3">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Renovar Plano</h3>
+                <form id="renewForm" method="POST">
+                    <input type="hidden" name="action" value="renew_plan">
+                    <input type="hidden" name="id" id="renewUserId">
+                    
+                    <div class="mb-4">
+                        <label for="days" class="block text-sm font-medium text-gray-700">Renovar por quantos dias? *</label>
+                        <select name="days" id="days" required 
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5">
+                            <option value="7">7 dias</option>
+                            <option value="15">15 dias</option>
+                            <option value="30" selected>30 dias (1 mês)</option>
+                            <option value="60">60 dias (2 meses)</option>
+                            <option value="90">90 dias (3 meses)</option>
+                            <option value="180">180 dias (6 meses)</option>
+                            <option value="365">365 dias (1 ano)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeRenewModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-150">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150">
+                            Renovar Plano
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para redefinir senha -->
     <div id="passwordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
         <div class="relative top-20 mx-auto p-6 border max-w-md shadow-lg rounded-md bg-white border-t-4 border-yellow-600">
@@ -489,6 +658,41 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             document.getElementById('password').required = false;
         }
 
+        function editSubscription(user) {
+            document.getElementById('subscriptionModal').classList.remove('hidden');
+            document.getElementById('subscriptionUserId').value = user.id;
+            document.getElementById('subscription_status').value = user.subscription_status || 'trial';
+            document.getElementById('subscription_plan_id').value = user.plan_id;
+            
+            // Preencher datas se existirem
+            if (user.trial_starts_at) {
+                document.getElementById('trial_starts_at').value = formatDateTimeLocal(user.trial_starts_at);
+            }
+            if (user.trial_ends_at) {
+                document.getElementById('trial_ends_at').value = formatDateTimeLocal(user.trial_ends_at);
+            }
+            if (user.plan_expires_at) {
+                document.getElementById('plan_expires_at').value = formatDateTimeLocal(user.plan_expires_at);
+            }
+            
+            toggleDateFields();
+        }
+
+        function closeSubscriptionModal() {
+            document.getElementById('subscriptionModal').classList.add('hidden');
+            document.getElementById('subscriptionForm').reset();
+        }
+
+        function renewPlan(id, name) {
+            document.getElementById('renewModal').classList.remove('hidden');
+            document.getElementById('renewUserId').value = id;
+        }
+
+        function closeRenewModal() {
+            document.getElementById('renewModal').classList.add('hidden');
+            document.getElementById('renewForm').reset();
+        }
+
         function deleteUser(id, name) {
             if (confirm('Tem certeza que deseja remover o usuário "' + name + '"? Esta ação não pode ser desfeita.')) {
                 const form = document.createElement('form');
@@ -512,6 +716,46 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             document.getElementById('passwordForm').reset();
         }
 
+        function toggleDateFields() {
+            const status = document.getElementById('subscription_status').value;
+            const trialStartField = document.getElementById('trialStartField');
+            const trialEndField = document.getElementById('trialEndField');
+            const planExpiryField = document.getElementById('planExpiryField');
+            
+            if (status === 'trial') {
+                trialStartField.style.display = 'block';
+                trialEndField.style.display = 'block';
+                planExpiryField.style.display = 'block';
+                document.getElementById('trial_starts_at').required = true;
+                document.getElementById('trial_ends_at').required = true;
+            } else if (status === 'active') {
+                trialStartField.style.display = 'none';
+                trialEndField.style.display = 'none';
+                planExpiryField.style.display = 'block';
+                document.getElementById('trial_starts_at').required = false;
+                document.getElementById('trial_ends_at').required = false;
+                document.getElementById('plan_expires_at').required = true;
+            } else {
+                trialStartField.style.display = 'none';
+                trialEndField.style.display = 'none';
+                planExpiryField.style.display = 'none';
+                document.getElementById('trial_starts_at').required = false;
+                document.getElementById('trial_ends_at').required = false;
+                document.getElementById('plan_expires_at').required = false;
+            }
+        }
+
+        function formatDateTimeLocal(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
         // Fechar modais ao clicar fora
         document.getElementById('userModal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -519,10 +763,27 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             }
         });
 
+        document.getElementById('subscriptionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSubscriptionModal();
+            }
+        });
+
+        document.getElementById('renewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRenewModal();
+            }
+        });
+
         document.getElementById('passwordModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closePasswordModal();
             }
+        });
+
+        // Inicializar campos de data ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleDateFields();
         });
     </script>
 </body>

@@ -223,6 +223,26 @@ class User {
         return $stmt->execute();
     }
 
+    public function updateSubscriptionDetails($user_id, $subscription_data) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET subscription_status=:subscription_status,
+                      trial_starts_at=:trial_starts_at,
+                      trial_ends_at=:trial_ends_at,
+                      plan_expires_at=:plan_expires_at,
+                      plan_id=:plan_id
+                  WHERE id=:id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":subscription_status", $subscription_data['subscription_status']);
+        $stmt->bindParam(":trial_starts_at", $subscription_data['trial_starts_at']);
+        $stmt->bindParam(":trial_ends_at", $subscription_data['trial_ends_at']);
+        $stmt->bindParam(":plan_expires_at", $subscription_data['plan_expires_at']);
+        $stmt->bindParam(":plan_id", $subscription_data['plan_id']);
+        $stmt->bindParam(":id", $user_id);
+        
+        return $stmt->execute();
+    }
+
     public function delete() {
         $query = "DELETE FROM " . $this->table_name . " WHERE id=:id";
         $stmt = $this->conn->prepare($query);
@@ -467,6 +487,30 @@ class User {
         
         if ($stmt->execute()) {
             $this->subscription_status = 'expired';
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Renovar plano por X dias
+     */
+    public function renewPlan($days = 30) {
+        $new_expiry = date('Y-m-d H:i:s', strtotime("+{$days} days"));
+        
+        $query = "UPDATE " . $this->table_name . " 
+                  SET subscription_status = 'active',
+                      plan_expires_at = :plan_expires_at
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':plan_expires_at', $new_expiry);
+        $stmt->bindParam(':id', $this->id);
+        
+        if ($stmt->execute()) {
+            $this->subscription_status = 'active';
+            $this->plan_expires_at = $new_expiry;
             return true;
         }
         

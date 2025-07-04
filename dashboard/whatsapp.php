@@ -468,11 +468,11 @@ if ($instance_name) {
                                                 <li>Aguarde a confirmação de conexão</li>
                                             </ol>
                                             
-                                            <div class="mt-4 p-3 bg-yellow-100 rounded border-l-4 border-yellow-400">
-                                                <p class="text-sm text-yellow-800">
-                                                    <i class="fas fa-exclamation-triangle mr-1"></i>
-                                                    <strong>Importante:</strong> Mantenha seu celular conectado à internet. 
-                                                    Se desconectar o WhatsApp do celular, a automação parará de funcionar.
+                                            <div class="mt-4 p-3 bg-blue-100 rounded border-l-4 border-blue-400">
+                                                <p class="text-sm text-blue-800">
+                                                    <i class="fas fa-info-circle mr-1"></i>
+                                                    <strong>Importante:</strong> Após conectar, você pode fechar o WhatsApp no celular. 
+                                                    A automação funcionará independentemente do WhatsApp estar aberto no seu dispositivo.
                                                 </p>
                                             </div>
                                         </div>

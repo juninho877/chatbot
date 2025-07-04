@@ -60,30 +60,38 @@ if ($_POST) {
                     ];
                     
                     foreach ($allowed_settings as $key => $type) {
-                        if (isset($_POST[$key])) {
-                            $value = $_POST[$key];
-                            
-                            // Validações específicas
-                            if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                                throw new Exception("Email do administrador inválido");
+                        $value = null;
+                        
+                        // Tratamento especial para campos booleanos (checkboxes)
+                        if ($type === 'boolean') {
+                            // Para checkboxes, verificar se está presente no POST
+                            $value = isset($_POST[$key]) && $_POST[$key] === 'on';
+                        } else {
+                            // Para outros tipos, verificar se está presente no POST
+                            if (isset($_POST[$key])) {
+                                $value = $_POST[$key];
+                            } else {
+                                // Se não está presente, pular esta configuração
+                                continue;
                             }
-                            
-                            if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
-                                throw new Exception("Delay do WhatsApp deve estar entre 1 e 60 segundos");
-                            }
-                            
-                            if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
-                                throw new Exception("Máximo de tentativas deve estar entre 1 e 10");
-                            }
-                            
-                            // Converter valores booleanos
-                            if ($type === 'boolean') {
-                                $value = isset($_POST[$key]) && $_POST[$key] === 'on';
-                            }
-                            
-                            if ($appSettings->set($key, $value, null, $type)) {
-                                $updated++;
-                            }
+                        }
+                        
+                        // Validações específicas
+                        if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                            throw new Exception("Email do administrador inválido");
+                        }
+                        
+                        if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
+                            throw new Exception("Delay do WhatsApp deve estar entre 1 e 60 segundos");
+                        }
+                        
+                        if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
+                            throw new Exception("Máximo de tentativas deve estar entre 1 e 10");
+                        }
+                        
+                        // Atualizar a configuração
+                        if ($appSettings->set($key, $value, null, $type)) {
+                            $updated++;
                         }
                     }
                     
@@ -105,13 +113,19 @@ if ($_POST) {
                             throw new Exception("Arquivo muito grande. Máximo 1MB.");
                         }
                         
+                        // Criar diretório de uploads se não existir
+                        $upload_dir = __DIR__ . '/../public/uploads/';
+                        if (!is_dir($upload_dir)) {
+                            mkdir($upload_dir, 0755, true);
+                        }
+                        
                         // Gerar nome único para o arquivo
                         $file_extension = pathinfo($favicon_file['name'], PATHINFO_EXTENSION);
                         if (empty($file_extension)) {
                             $file_extension = 'ico';
                         }
                         $new_filename = 'favicon_' . time() . '.' . $file_extension;
-                        $upload_path = __DIR__ . '/../public/uploads/' . $new_filename;
+                        $upload_path = $upload_dir . $new_filename;
                         $web_path = '/public/uploads/' . $new_filename;
                         
                         // Mover arquivo para diretório de uploads
@@ -361,14 +375,20 @@ $timezones = [
                                     <div class="border-t pt-6">
                                         <h4 class="text-lg font-medium text-gray-900 mb-4">Funcionalidades</h4>
                                         <div class="space-y-4">
-                                            <div class="flex items-center">
-                                                <input type="checkbox" name="auto_billing_enabled" id="auto_billing_enabled" 
-                                                       <?php echo ($all_settings['auto_billing_enabled']['value'] ?? false) ? 'checked' : ''; ?>
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="auto_billing_enabled" class="ml-2 block text-sm text-gray-700">
-                                                    <strong>Cobrança Automática Ativa</strong>
-                                                    <span class="block text-xs text-gray-500">Enviar mensagens automáticas de cobrança via cron job</span>
-                                                </label>
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="auto_billing_enabled" id="auto_billing_enabled" 
+                                                           <?php echo ($all_settings['auto_billing_enabled']['value'] ?? false) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="auto_billing_enabled" class="font-medium text-gray-700">
+                                                        Cobrança Automática Ativa
+                                                    </label>
+                                                    <p class="text-gray-500">
+                                                        Quando ativada, o sistema enviará mensagens automáticas de cobrança via cron job para clientes com vencimento próximo ou em atraso.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -428,9 +448,47 @@ $timezones = [
                                     
                                     <div>
                                         <strong>Diretório de Uploads:</strong><br>
-                                        <span class="text-gray-600"><?php echo is_writable(__DIR__ . '/../public/uploads') ? 'Gravável' : 'Não gravável'; ?></span>
+                                        <span class="text-gray-600">
+                                            <?php 
+                                            $upload_dir = __DIR__ . '/../public/uploads';
+                                            if (!is_dir($upload_dir)) {
+                                                echo 'Não existe';
+                                            } elseif (is_writable($upload_dir)) {
+                                                echo 'Gravável';
+                                            } else {
+                                                echo 'Não gravável';
+                                            }
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Instruções de Automação -->
+                        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <h4 class="text-lg font-medium text-blue-900 mb-3">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Sobre a Cobrança Automática
+                            </h4>
+                            <div class="text-sm text-blue-800 space-y-2">
+                                <p>
+                                    <strong>Como funciona:</strong> Quando ativada, o sistema executará automaticamente (via cron job) as seguintes ações:
+                                </p>
+                                <ul class="list-disc list-inside ml-4 space-y-1">
+                                    <li>Enviar lembretes para clientes com vencimento hoje</li>
+                                    <li>Enviar avisos antecipados para clientes com vencimento em 3 dias</li>
+                                    <li>Enviar cobranças para clientes em atraso</li>
+                                </ul>
+                                <p class="mt-3">
+                                    <strong>Requisitos:</strong> Para funcionar corretamente, é necessário:
+                                </p>
+                                <ul class="list-disc list-inside ml-4 space-y-1">
+                                    <li>Ter o WhatsApp conectado</li>
+                                    <li>Configurar templates de mensagem</li>
+                                    <li>Configurar o cron job no servidor</li>
+                                    <li>Ter clientes com datas de vencimento definidas</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -452,7 +510,7 @@ $timezones = [
                         preview = document.createElement('div');
                         preview.id = 'favicon-preview';
                         preview.className = 'mt-2 flex items-center';
-                        e.target.parentNode.appendChild(preview);
+                        document.getElementById('favicon').parentNode.appendChild(preview);
                     }
                     
                     preview.innerHTML = `
@@ -487,6 +545,18 @@ $timezones = [
                 alert('Email do administrador inválido');
                 e.preventDefault();
                 return;
+            }
+        });
+
+        // Feedback visual para o checkbox
+        document.getElementById('auto_billing_enabled').addEventListener('change', function() {
+            const label = document.querySelector('label[for="auto_billing_enabled"]');
+            if (this.checked) {
+                label.classList.add('text-green-700');
+                label.classList.remove('text-gray-700');
+            } else {
+                label.classList.add('text-gray-700');
+                label.classList.remove('text-green-700');
             }
         });
     </script>

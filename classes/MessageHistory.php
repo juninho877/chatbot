@@ -12,6 +12,7 @@ class MessageHistory {
     public $message;
     public $phone;
     public $status;
+    public $whatsapp_message_id;
     public $sent_at;
 
     public function __construct($db) {
@@ -21,7 +22,7 @@ class MessageHistory {
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " 
                   SET user_id=:user_id, client_id=:client_id, template_id=:template_id, 
-                      message=:message, phone=:phone, status=:status";
+                      message=:message, phone=:phone, status=:status, whatsapp_message_id=:whatsapp_message_id";
         
         $stmt = $this->conn->prepare($query);
         
@@ -31,6 +32,7 @@ class MessageHistory {
         $stmt->bindParam(":message", $this->message);
         $stmt->bindParam(":phone", $this->phone);
         $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":whatsapp_message_id", $this->whatsapp_message_id);
         
         if($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
@@ -105,12 +107,40 @@ class MessageHistory {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateStatus($id, $status) {
+    public function updateStatus($whatsapp_message_id, $status) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET status = :status 
+                  WHERE whatsapp_message_id = :whatsapp_message_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':whatsapp_message_id', $whatsapp_message_id);
+        return $stmt->execute();
+    }
+
+    public function updateStatusById($id, $status) {
         $query = "UPDATE " . $this->table_name . " SET status = :status WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
+    }
+
+    public function getByWhatsAppMessageId($whatsapp_message_id) {
+        $query = "SELECT mh.*, c.name as client_name 
+                  FROM " . $this->table_name . " mh
+                  LEFT JOIN clients c ON mh.client_id = c.id
+                  WHERE mh.whatsapp_message_id = :whatsapp_message_id 
+                  LIMIT 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':whatsapp_message_id', $whatsapp_message_id);
+        $stmt->execute();
+        
+        if($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+        return false;
     }
 }
 ?>

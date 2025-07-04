@@ -61,6 +61,50 @@ class MessageTemplate {
         return false;
     }
 
+    public function readByName($user_id, $name) {
+        $query = "SELECT * FROM " . $this->table_name . " 
+                  WHERE user_id = :user_id AND name = :name AND active = 1 
+                  LIMIT 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':name', $name);
+        $stmt->execute();
+        
+        if($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->id = $row['id'];
+            $this->name = $row['name'];
+            $this->type = $row['type'];
+            $this->message = $row['message'];
+            $this->active = $row['active'];
+            return true;
+        }
+        return false;
+    }
+
+    public function readByType($user_id, $type) {
+        $query = "SELECT * FROM " . $this->table_name . " 
+                  WHERE user_id = :user_id AND type = :type AND active = 1 
+                  ORDER BY created_at DESC LIMIT 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':type', $type);
+        $stmt->execute();
+        
+        if($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->id = $row['id'];
+            $this->name = $row['name'];
+            $this->type = $row['type'];
+            $this->message = $row['message'];
+            $this->active = $row['active'];
+            return true;
+        }
+        return false;
+    }
+
     public function update() {
         $query = "UPDATE " . $this->table_name . " 
                   SET name=:name, type=:type, message=:message, active=:active 

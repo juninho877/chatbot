@@ -89,6 +89,17 @@ class User {
         return false;
     }
 
+    public function readAll() {
+        $query = "SELECT id, name, email, plan_id, whatsapp_instance, whatsapp_connected 
+                  FROM " . $this->table_name . " 
+                  WHERE whatsapp_instance IS NOT NULL AND whatsapp_connected = 1
+                  ORDER BY id ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function updateWhatsAppInstance($instance_name) {
         $query = "UPDATE " . $this->table_name . " 
                   SET whatsapp_instance=:instance, whatsapp_connected=1 

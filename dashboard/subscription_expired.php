@@ -94,9 +94,25 @@ $subscription_info = $user->getSubscriptionInfo();
                                 </h3>
                                 <p class="text-sm text-red-700 mt-1">
                                     <?php if ($user->subscription_status === 'trial'): ?>
-                                        Período de teste: <?php echo date('d/m/Y', strtotime($user->trial_starts_at)); ?> - <?php echo date('d/m/Y', strtotime($user->trial_ends_at)); ?>
+                                        Período de teste: 
+                                        <?php 
+                                        // CORREÇÃO: Verificar se as datas não são null antes de usar strtotime
+                                        if (!empty($user->trial_starts_at) && !empty($user->trial_ends_at)) {
+                                            echo date('d/m/Y', strtotime($user->trial_starts_at)) . ' - ' . date('d/m/Y', strtotime($user->trial_ends_at));
+                                        } else {
+                                            echo 'Datas não disponíveis';
+                                        }
+                                        ?>
                                     <?php else: ?>
-                                        Assinatura expirou em: <?php echo date('d/m/Y H:i', strtotime($user->plan_expires_at)); ?>
+                                        Assinatura expirou em: 
+                                        <?php 
+                                        // CORREÇÃO: Verificar se plan_expires_at não é null antes de usar strtotime
+                                        if (!empty($user->plan_expires_at)) {
+                                            echo date('d/m/Y H:i', strtotime($user->plan_expires_at));
+                                        } else {
+                                            echo 'Data não disponível';
+                                        }
+                                        ?>
                                     <?php endif; ?>
                                 </p>
                             </div>

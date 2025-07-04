@@ -135,6 +135,7 @@ class User {
                 $this->notify_1_day_before = (bool)($row['notify_1_day_before'] ?? false);
                 $this->notify_on_due_date = (bool)($row['notify_on_due_date'] ?? true);
                 $this->notify_1_day_after_due = (bool)($row['notify_1_day_after_due'] ?? false);
+
                 // Carregar informações de assinatura e teste
                 $this->trial_starts_at = $row['trial_starts_at'];
                 $this->trial_ends_at = $row['trial_ends_at'];
@@ -301,10 +302,21 @@ class User {
             return false;
         }
         
-        $now = new DateTime();
-        $trial_end = new DateTime($this->trial_ends_at);
+        // CORREÇÃO: Verificar se trial_ends_at não é null ou vazio
+        if (empty($this->trial_ends_at)) {
+            error_log("Warning: trial_ends_at is empty for user " . $this->id);
+            return true; // Considerar expirado se não há data definida
+        }
         
-        return $now > $trial_end;
+        try {
+            $now = new DateTime();
+            $trial_end = new DateTime($this->trial_ends_at);
+            
+            return $now > $trial_end;
+        } catch (Exception $e) {
+            error_log("Error parsing trial_ends_at date: " . $e->getMessage());
+            return true; // Considerar expirado em caso de erro
+        }
     }
 
     /**
@@ -330,15 +342,26 @@ class User {
             return 0;
         }
         
-        $now = new DateTime();
-        $trial_end = new DateTime($this->trial_ends_at);
-        
-        if ($now > $trial_end) {
+        // CORREÇÃO: Verificar se trial_ends_at não é null ou vazio
+        if (empty($this->trial_ends_at)) {
+            error_log("Warning: trial_ends_at is empty for user " . $this->id);
             return 0;
         }
         
-        $diff = $now->diff($trial_end);
-        return $diff->days;
+        try {
+            $now = new DateTime();
+            $trial_end = new DateTime($this->trial_ends_at);
+            
+            if ($now > $trial_end) {
+                return 0;
+            }
+            
+            $diff = $now->diff($trial_end);
+            return $diff->days;
+        } catch (Exception $e) {
+            error_log("Error parsing trial_ends_at date: " . $e->getMessage());
+            return 0;
+        }
     }
 
     /**

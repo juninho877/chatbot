@@ -144,7 +144,15 @@ $subscription_info = $current_user->getSubscriptionInfo();
                                 <div class="ml-3">
                                     <p class="text-sm text-green-800">
                                         <strong>Assinatura Ativa:</strong>
-                                        Sua assinatura está ativa até <?php echo date('d/m/Y', strtotime($subscription_info['plan_expires_at'])); ?>.
+                                        Sua assinatura está ativa até 
+                                        <?php 
+                                        // CORREÇÃO: Verificar se plan_expires_at não é null antes de usar strtotime
+                                        if (!empty($subscription_info['plan_expires_at'])) {
+                                            echo date('d/m/Y', strtotime($subscription_info['plan_expires_at']));
+                                        } else {
+                                            echo 'N/A';
+                                        }
+                                        ?>.
                                     </p>
                                 </div>
                             </div>

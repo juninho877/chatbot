@@ -8,7 +8,6 @@
 
 // Incluir arquivos necessários
 require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../classes/User.php';
 
 // Verificar se o usuário está logado

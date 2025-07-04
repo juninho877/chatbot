@@ -3,6 +3,10 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// Incluir arquivos necessários
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/../classes/AppSettings.php';
+
 // Configurações da API Evolution V2
 define('EVOLUTION_API_URL', 'https://evov2.duckdns.org');
 define('EVOLUTION_API_KEY', '79Bb4lpu2TzxrSMu3SDfSGvB3MIhkur7');
@@ -29,12 +33,9 @@ function getSiteName() {
 // Função para obter configurações do banco de dados
 function getAppSetting($key, $default = null) {
     static $settings = null;
-    
+
     if ($settings === null) {
         try {
-            require_once __DIR__ . '/database.php';
-            require_once __DIR__ . '/../classes/AppSettings.php';
-            
             $database = new Database();
             $db = $database->getConnection();
             
@@ -56,6 +57,7 @@ function getAppSetting($key, $default = null) {
 
 // Definir constantes baseadas nas configurações do banco
 define('ADMIN_EMAIL', getAppSetting('admin_email', 'admin@clientmanager.com'));
+define('SITE_NAME', getAppSetting('site_name', 'ClientManager Pro'));
 define('FAVICON_PATH', getAppSetting('favicon_path', '/favicon.ico'));
 
 // Atualizar timezone se configurado no banco

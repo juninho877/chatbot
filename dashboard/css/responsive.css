@@ -136,6 +136,23 @@
     .touch-action-none {
         touch-action: none;
     }
+    
+    /* Dark mode toggle button size adjustment for mobile */
+    .dark-mode-toggle {
+        width: 32px !important;
+        height: 16px !important;
+    }
+    
+    .dark-mode-toggle::before {
+        width: 14px !important;
+        height: 14px !important;
+        top: 1px !important;
+        left: 1px !important;
+    }
+    
+    .dark-mode-toggle.active::before {
+        transform: translateX(16px) !important;
+    }
 }
 
 /* Estilos para o menu mobile da landing page */

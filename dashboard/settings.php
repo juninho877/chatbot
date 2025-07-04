@@ -6,6 +6,7 @@ require_once __DIR__ . '/../classes/AppSettings.php';
 // Verificar se está logado
 if (!isset($_SESSION['user_id'])) {
     redirect("../login.php");
+    exit();
 }
 
 $database = new Database();
@@ -34,6 +35,7 @@ if (!$is_admin) {
     // Redirecionar para dashboard com mensagem de erro
     $_SESSION['error_message'] = 'Acesso negado. Apenas administradores podem acessar as configurações do sistema.';
     redirect("index.php");
+    exit();
 }
 
 $appSettings = new AppSettings($db);
@@ -55,134 +57,151 @@ if (isset($_SESSION['error'])) {
 // Processar ações
 if ($_POST) {
     try {
-        if (isset($_POST['action'])) {
-            switch ($_POST['action']) {
-                case 'update_settings':
-                    $updated = 0;
-                    
-                    // Lista de configurações que podem ser atualizadas
-                    $allowed_settings = [
-                        'admin_email' => 'email',
-                        'site_name' => 'string',
-                        'timezone' => 'string',
-                        'auto_billing_enabled' => 'boolean',
-                        'whatsapp_delay_seconds' => 'number',
-                        'max_retry_attempts' => 'number',
-                        // Novas configurações de notificação
-                        'notify_5_days_before' => 'boolean',
-                        'notify_3_days_before' => 'boolean',
-                        'notify_2_days_before' => 'boolean',
-                        'notify_1_day_before' => 'boolean',
-                        'notify_on_due_date' => 'boolean',
-                        'notify_1_day_after_due' => 'boolean'
-                    ];
-                    
-                    foreach ($allowed_settings as $key => $type) {
-                        $value = null;
-                        
-                        // Tratamento especial para campos booleanos (checkboxes)
-                        if ($type === 'boolean') {
-                            // Para checkboxes, verificar se está presente no POST
-                            $value = isset($_POST[$key]) && $_POST[$key] === 'on';
-                        } else {
-                            // Para outros tipos, verificar se está presente no POST
-                            if (isset($_POST[$key])) {
-                                $value = $_POST[$key];
-                            } else {
-                                // Se não está presente, pular esta configuração
-                                continue;
-                            }
-                        }
-                        
-                        // Validações específicas
-                        if ($key === 'admin_email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                            $_SESSION['error'] = "Email do administrador inválido";
-                            redirect("settings.php");
-                        }
-                        
-                        if ($key === 'whatsapp_delay_seconds' && ($value < 1 || $value > 60)) {
-                            $_SESSION['error'] = "Delay do WhatsApp deve estar entre 1 e 60 segundos";
-                            redirect("settings.php");
-                        }
-                        
-                        if ($key === 'max_retry_attempts' && ($value < 1 || $value > 10)) {
-                            $_SESSION['error'] = "Máximo de tentativas deve estar entre 1 e 10";
-                            redirect("settings.php");
-                        }
-                        
-                        // Atualizar a configuração
-                        if ($appSettings->set($key, $value, null, $type)) {
-                            $updated++;
-                        }
-                    }
-                    
-                    // Processar upload do favicon
-                    if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
-                        $favicon_file = $_FILES['favicon'];
-                        
-                        // Validar tipo de arquivo
-                        $allowed_types = ['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/jpeg', 'image/gif'];
-                        $file_type = $favicon_file['type'];
-                        $file_info = getimagesize($favicon_file['tmp_name']);
-                        
-                        if (!in_array($file_type, $allowed_types) && !$file_info) {
-                            $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
-                        }
-                        
-                        // Validar tamanho (máximo 1MB)
-                        if ($favicon_file['size'] > 1024 * 1024) {
-                            $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
-                            redirect("settings.php");
-                        
-                        // Criar diretório de uploads se não existir
-                        $upload_dir = __DIR__ . '/../public/uploads/';
-                        if (!is_dir($upload_dir)) {
-                            mkdir($upload_dir, 0755, true);
-                        }
-                        
-                        // Gerar nome único para o arquivo
-                        $file_extension = pathinfo($favicon_file['name'], PATHINFO_EXTENSION);
-                        if (empty($file_extension)) {
-                            $file_extension = 'ico';
-                        }
-                        $new_filename = 'favicon_' . time() . '.' . $file_extension;
-                        $upload_path = $upload_dir . $new_filename;
-                        $web_path = '/public/uploads/' . $new_filename;
-                        
-                        // Mover arquivo para diretório de uploads
-                        if (move_uploaded_file($favicon_file['tmp_name'], $upload_path)) {
-                            // Remover favicon anterior se existir
-                            $old_favicon = $appSettings->get('favicon_path');
-                            if ($old_favicon && $old_favicon !== '/favicon.ico' && file_exists(__DIR__ . '/..' . $old_favicon)) {
-                                unlink(__DIR__ . '/..' . $old_favicon);
-                            }
-                            
-                            // Salvar novo caminho no banco
-                            if ($appSettings->set('favicon_path', $web_path, 'Caminho para o favicon do site', 'string')) {
-                                $updated++;
-                                $favicon_message = "Favicon atualizado com sucesso!";
-                            }
-                        } else {
-                            $_SESSION['error'] = "Erro ao fazer upload do favicon.";
-                            redirect("settings.php");
-                    }
-                    
-                    if ($updated > 0) {
-                        $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
-                        if (isset($favicon_message)) {
-                            $success_message .= $favicon_message;
-                        }
-                            $success_message .= " " . $favicon_message;
-                    }
-                    
-                    
-                    // Redirecionar para evitar reenvio
-                    redirect("settings.php");
-                    break;
+        if (isset($_POST['action']) && $_POST['action'] === 'update_settings') {
+            $updated = 0;
+            $has_error = false;
+            
+            // Lista de configurações que podem ser atualizadas
+            $allowed_settings = [
+                'admin_email' => 'email',
+                'site_name' => 'string',
+                'timezone' => 'string',
+                'auto_billing_enabled' => 'boolean',
+                'whatsapp_delay_seconds' => 'number',
+                'max_retry_attempts' => 'number',
+                // Novas configurações de notificação
+                'notify_5_days_before' => 'boolean',
+                'notify_3_days_before' => 'boolean',
+                'notify_2_days_before' => 'boolean',
+                'notify_1_day_before' => 'boolean',
+                'notify_on_due_date' => 'boolean',
+                'notify_1_day_after_due' => 'boolean'
+            ];
+            
+            // Validações iniciais
+            if (isset($_POST['admin_email']) && !filter_var($_POST['admin_email'], FILTER_VALIDATE_EMAIL)) {
+                $has_error = true;
+                $_SESSION['error'] = "Email do administrador inválido";
             }
+            
+            if (isset($_POST['whatsapp_delay_seconds']) && 
+                (intval($_POST['whatsapp_delay_seconds']) < 1 || intval($_POST['whatsapp_delay_seconds']) > 60)) {
+                $has_error = true;
+                $_SESSION['error'] = "Delay do WhatsApp deve estar entre 1 e 60 segundos";
+            }
+            
+            if (isset($_POST['max_retry_attempts']) && 
+                (intval($_POST['max_retry_attempts']) < 1 || intval($_POST['max_retry_attempts']) > 10)) {
+                $has_error = true;
+                $_SESSION['error'] = "Máximo de tentativas deve estar entre 1 e 10";
+            }
+            
+            // Processar upload do favicon se não houver erros
+            $favicon_updated = false;
+            $favicon_message = "";
+            
+            if (!$has_error && isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
+                $favicon_file = $_FILES['favicon'];
+                
+                // Validar tipo de arquivo
+                $allowed_types = ['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/jpeg', 'image/gif'];
+                $file_type = $favicon_file['type'];
+                $file_info = getimagesize($favicon_file['tmp_name']);
+                
+                if (!in_array($file_type, $allowed_types) && !$file_info) {
+                    $has_error = true;
+                    $_SESSION['error'] = "Tipo de arquivo não suportado para favicon. Use ICO, PNG, JPG ou GIF.";
+                } elseif ($favicon_file['size'] > 1024 * 1024) {
+                    // Validar tamanho (máximo 1MB)
+                    $has_error = true;
+                    $_SESSION['error'] = "Arquivo muito grande. Máximo 1MB.";
+                } else {
+                    // Criar diretório de uploads se não existir
+                    $upload_dir = __DIR__ . '/../public/uploads/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+                    
+                    // Gerar nome único para o arquivo
+                    $file_extension = pathinfo($favicon_file['name'], PATHINFO_EXTENSION);
+                    if (empty($file_extension)) {
+                        $file_extension = 'ico';
+                    }
+                    $new_filename = 'favicon_' . time() . '.' . $file_extension;
+                    $upload_path = $upload_dir . $new_filename;
+                    $web_path = '/public/uploads/' . $new_filename;
+                    
+                    // Mover arquivo para diretório de uploads
+                    if (move_uploaded_file($favicon_file['tmp_name'], $upload_path)) {
+                        // Remover favicon anterior se existir
+                        $old_favicon = $appSettings->get('favicon_path');
+                        if ($old_favicon && $old_favicon !== '/favicon.ico' && file_exists(__DIR__ . '/..' . $old_favicon)) {
+                            unlink(__DIR__ . '/..' . $old_favicon);
+                        }
+                        
+                        // Salvar novo caminho no banco
+                        if ($appSettings->set('favicon_path', $web_path, 'Caminho para o favicon do site', 'string')) {
+                            $updated++;
+                            $favicon_updated = true;
+                            $favicon_message = " Favicon atualizado com sucesso!";
+                        }
+                    } else {
+                        $has_error = true;
+                        $_SESSION['error'] = "Erro ao fazer upload do favicon.";
+                    }
+                }
+            }
+            
+            // Se não houver erros, atualizar as configurações
+            if (!$has_error) {
+                foreach ($allowed_settings as $key => $type) {
+                    $value = null;
+                    
+                    // Tratamento especial para campos booleanos (checkboxes)
+                    if ($type === 'boolean') {
+                        // Para checkboxes, verificar se está presente no POST
+                        $value = isset($_POST[$key]) && $_POST[$key] === 'on';
+                    } else {
+                        // Para outros tipos, verificar se está presente no POST
+                        if (isset($_POST[$key])) {
+                            $value = $_POST[$key];
+                        } else {
+                            // Se não está presente, pular esta configuração
+                            continue;
+                        }
+                    }
+                    
+                    // Atualizar a configuração
+                    if ($appSettings->set($key, $value, null, $type)) {
+                        $updated++;
+                    }
+                }
+                
+                // Atualizar timezone se foi alterado
+                if (isset($_POST['timezone'])) {
+                    date_default_timezone_set($_POST['timezone']);
+                }
+                
+                // Definir mensagem de sucesso
+                if ($updated > 0 || $favicon_updated) {
+                    $success_message = "Configurações atualizadas com sucesso! ($updated alterações)";
+                    if ($favicon_updated) {
+                        $success_message .= $favicon_message;
+                    }
+                    $_SESSION['message'] = $success_message;
+                } else {
+                    $_SESSION['error'] = "Nenhuma configuração foi alterada.";
+                }
+            }
+            
+            // Redirecionar para evitar reenvio
+            redirect("settings.php");
+            exit();
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Erro: " . $e->getMessage();
+        redirect("settings.php");
+        exit();
     }
 }
 
@@ -214,7 +233,6 @@ $timezones = [
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
     <link href="css/dark_mode.css" rel="stylesheet">
-    <link href="css/responsive.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 dark:bg-slate-900">
     <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
@@ -244,15 +262,7 @@ $timezones = [
                                 </div>
                             </div>
                         <?php endif; ?>
-                        $_SESSION['message'] = $success_message;
-                    } else {
-                        $_SESSION['error'] = "Nenhuma configuração foi alterada.";
-                    }
-                    
-                    // Atualizar timezone se foi alterado
-                    if (isset($_POST['timezone'])) {
-                        date_default_timezone_set($_POST['timezone']);
-                    }
+                        
                         <?php if ($error): ?>
                             <div class="mt-4 bg-red-100 border-red-400 text-red-800 p-4 rounded-lg shadow-sm">
                                 <div class="flex">
@@ -483,43 +493,44 @@ $timezones = [
                         </div>
 
                         <!-- Informações do Sistema -->
-                        <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+                        <div class="mt-8 bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
                             <div class="px-6 py-6 sm:p-8">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">Informações do Sistema</h3>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Informações do Sistema</h3>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div>
                                         <strong>Última Execução do Cron:</strong><br>
-                                        <span class="text-gray-600"><?php echo htmlspecialchars($appSettings->getCronLastRun()); ?></span>
+                                        <span class="text-gray-600 dark:text-slate-400"><?php echo htmlspecialchars($appSettings->getCronLastRun()); ?></span>
                                     </div>
                                     
                                     <div>
                                         <strong>Timezone Atual:</strong><br>
-                                        <span class="text-gray-600"><?php echo date_default_timezone_get(); ?></span>
+                                        <span class="text-gray-600 dark:text-slate-400"><?php echo date_default_timezone_get(); ?></span>
                                     </div>
                                     
                                     <div>
                                         <strong>Data/Hora Atual:</strong><br>
-                                        <span class="text-gray-600"><?php echo date('d/m/Y H:i:s'); ?></span>
+                                        <span class="text-gray-600 dark:text-slate-400"><?php echo date('d/m/Y H:i:s'); ?></span>
                                     </div>
                                     
                                     <div>
                                         <strong>Versão do PHP:</strong><br>
-                                        <span class="text-gray-600"><?php echo phpversion(); ?></span>
+                                        <span class="text-gray-600 dark:text-slate-400"><?php echo phpversion(); ?></span>
                                     </div>
                                     
                                     <div>
                                         <strong>Usuário Logado:</strong><br>
-                                        <span class="text-gray-600"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
+                                        <span class="text-gray-600 dark:text-slate-400"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
                                     </div>
                                     
                                     <div>
                                         <strong>Nível de Acesso:</strong><br>
-                                        <span class="text-red-600 font-medium">Administrador</span>
+                                        <span class="text-red-600 dark:text-red-400 font-medium">Administrador</span>
                                     </div>
                                     
                                     <div>
-                                        <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600' : 'text-red-600'; ?> font-medium">
+                                        <strong>Cobrança Automática:</strong><br>
+                                        <span class="<?php echo $appSettings->isAutoBillingEnabled() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'; ?> font-medium">
                                             <?php echo $appSettings->isAutoBillingEnabled() ? 'Ativa' : 'Inativa'; ?>
                                         </span>
                                     </div>
@@ -550,7 +561,7 @@ $timezones = [
                     
                     preview.innerHTML = `
                         <img src="${e.target.result}" alt="Preview do favicon" class="w-4 h-4 mr-2">
-                        <span class="text-xs text-gray-600">Preview do novo favicon</span>
+                        <span class="text-xs text-gray-600 dark:text-slate-400">Preview do novo favicon</span>
                     `;
                 };
                 reader.readAsDataURL(file);
@@ -595,6 +606,13 @@ $timezones = [
                     label.classList.remove('text-green-700');
                 }
             });
+            
+            // Inicializar cores ao carregar a página
+            const label = document.querySelector('label[for="' + checkbox.id + '"]');
+            if (checkbox.checked && label) {
+                label.classList.add('text-green-700');
+                label.classList.remove('text-gray-700');
+            }
         });
     </script>
 </body>

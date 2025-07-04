@@ -225,5 +225,56 @@ class AppSettings {
     public function getCronLastRun() {
         return $this->get('cron_last_run', 'Nunca executado');
     }
+
+    /**
+     * Métodos para configurações de notificação
+     */
+    public function isNotify5DaysBeforeEnabled() {
+        return $this->get('notify_5_days_before', false);
+    }
+
+    public function setNotify5DaysBeforeEnabled($enabled) {
+        return $this->set('notify_5_days_before', $enabled, 'Enviar aviso 5 dias antes do vencimento', 'boolean');
+    }
+
+    public function isNotify3DaysBeforeEnabled() {
+        return $this->get('notify_3_days_before', true);
+    }
+
+    public function setNotify3DaysBeforeEnabled($enabled) {
+        return $this->set('notify_3_days_before', $enabled, 'Enviar aviso 3 dias antes do vencimento', 'boolean');
+    }
+
+    public function isNotify2DaysBeforeEnabled() {
+        return $this->get('notify_2_days_before', false);
+    }
+
+    public function setNotify2DaysBeforeEnabled($enabled) {
+        return $this->set('notify_2_days_before', $enabled, 'Enviar aviso 2 dias antes do vencimento', 'boolean');
+    }
+
+    public function isNotify1DayBeforeEnabled() {
+        return $this->get('notify_1_day_before', false);
+    }
+
+    public function setNotify1DayBeforeEnabled($enabled) {
+        return $this->set('notify_1_day_before', $enabled, 'Enviar aviso 1 dia antes do vencimento', 'boolean');
+    }
+
+    public function isNotifyOnDueDateEnabled() {
+        return $this->get('notify_on_due_date', true);
+    }
+
+    public function setNotifyOnDueDateEnabled($enabled) {
+        return $this->set('notify_on_due_date', $enabled, 'Enviar aviso no dia do vencimento', 'boolean');
+    }
+
+    public function isNotify1DayAfterDueEnabled() {
+        return $this->get('notify_1_day_after_due', false);
+    }
+
+    public function setNotify1DayAfterDueEnabled($enabled) {
+        return $this->set('notify_1_day_after_due', $enabled, 'Enviar aviso 1 dia após o vencimento', 'boolean');
+    }
 }
 ?>

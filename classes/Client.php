@@ -136,6 +136,37 @@ class Client {
         return $stmt;
     }
 
+    // Método para buscar clientes com vencimento em um dia específico
+    public function getClientsDueInDays($user_id, $days_ahead) {
+        $query = "SELECT * FROM " . $this->table_name . " 
+                  WHERE user_id = :user_id 
+                  AND status = 'active' 
+                  AND due_date IS NOT NULL 
+                  AND due_date = DATE_ADD(CURDATE(), INTERVAL :days_ahead DAY)
+                  ORDER BY due_date ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':days_ahead', $days_ahead);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Método para buscar clientes com vencimento hoje
+    public function getClientsDueToday($user_id) {
+        $query = "SELECT * FROM " . $this->table_name . " 
+                  WHERE user_id = :user_id 
+                  AND status = 'active' 
+                  AND due_date IS NOT NULL 
+                  AND due_date = CURDATE()
+                  ORDER BY due_date ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        return $stmt;
+    }
+
     // Método para buscar clientes com pagamento em atraso
     public function getOverdueClients($user_id) {
         $query = "SELECT * FROM " . $this->table_name . " 
@@ -147,6 +178,22 @@ class Client {
         
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Método para buscar clientes com atraso de 1 dia específico
+    public function getClientsOverdueDays($user_id, $days_overdue) {
+        $query = "SELECT * FROM " . $this->table_name . " 
+                  WHERE user_id = :user_id 
+                  AND status = 'active' 
+                  AND due_date IS NOT NULL 
+                  AND due_date = DATE_SUB(CURDATE(), INTERVAL :days_overdue DAY)
+                  ORDER BY due_date ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':days_overdue', $days_overdue);
         $stmt->execute();
         return $stmt;
     }

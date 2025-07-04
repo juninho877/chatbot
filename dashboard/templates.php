@@ -227,19 +227,66 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <div class="px-6 py-6 sm:p-8">
                                 <h3 class="text-xl font-semibold text-gray-900 mb-4">Templates Sugeridos</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <!-- Templates para períodos específicos -->
                                     <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Cobrança Amigável</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!</p>
-                                        <button onclick="useTemplate('Cobrança Amigável', 'cobranca', 'Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!')" 
+                                        <h4 class="font-semibold text-gray-900 mb-2">Aviso 5 dias antes</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊</p>
+                                        <button onclick="useTemplate('Aviso 5 dias antes', 'due_5_days_before', 'Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
                                     </div>
                                     
                                     <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                                        <h4 class="font-semibold text-gray-900 mb-2">Lembrete de Vencimento</h4>
-                                        <p class="text-sm text-gray-600 mb-3">Oi {nome}, lembrando que sua mensalidade de {valor} vence hoje ({vencimento}). Pode efetuar o pagamento?</p>
-                                        <button onclick="useTemplate('Lembrete de Vencimento', 'lembrete', 'Oi {nome}, lembrando que sua mensalidade de {valor} vence hoje ({vencimento}). Pode efetuar o pagamento?')" 
+                                        <h4 class="font-semibold text-gray-900 mb-2">Lembrete 3 dias antes</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!</p>
+                                        <button onclick="useTemplate('Lembrete 3 dias antes', 'due_3_days_before', 'Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!')" 
+                                                class="text-purple-600 text-sm hover:underline">
+                                            Usar este template
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                        <h4 class="font-semibold text-gray-900 mb-2">Aviso 2 dias antes</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔</p>
+                                        <button onclick="useTemplate('Aviso 2 dias antes', 'due_2_days_before', 'Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔')" 
+                                                class="text-purple-600 text-sm hover:underline">
+                                            Usar este template
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                        <h4 class="font-semibold text-gray-900 mb-2">Último aviso (1 dia antes)</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️</p>
+                                        <button onclick="useTemplate('Último aviso (1 dia antes)', 'due_1_day_before', 'Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️')" 
+                                                class="text-purple-600 text-sm hover:underline">
+                                            Usar este template
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                        <h4 class="font-semibold text-gray-900 mb-2">Vencimento hoje</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏</p>
+                                        <button onclick="useTemplate('Vencimento hoje', 'due_today', 'Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏')" 
+                                                class="text-purple-600 text-sm hover:underline">
+                                            Usar este template
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                        <h4 class="font-semibold text-gray-900 mb-2">Atraso 1 dia</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨</p>
+                                        <button onclick="useTemplate('Atraso 1 dia', 'overdue_1_day', 'Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨')" 
+                                                class="text-purple-600 text-sm hover:underline">
+                                            Usar este template
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Templates clássicos -->
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                        <h4 class="font-semibold text-gray-900 mb-2">Cobrança Amigável</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!</p>
+                                        <button onclick="useTemplate('Cobrança Amigável', 'cobranca', 'Olá {nome}! Seu pagamento de {valor} vence em {vencimento}. Obrigado!')" 
                                                 class="text-purple-600 text-sm hover:underline">
                                             Usar este template
                                         </button>
@@ -293,7 +340,13 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                                     'cobranca' => 'Cobrança',
                                                     'lembrete' => 'Lembrete',
                                                     'boas_vindas' => 'Boas Vindas',
-                                                    'custom' => 'Personalizado'
+                                                    'custom' => 'Personalizado',
+                                                    'due_5_days_before' => '5 dias antes',
+                                                    'due_3_days_before' => '3 dias antes',
+                                                    'due_2_days_before' => '2 dias antes',
+                                                    'due_1_day_before' => '1 dia antes',
+                                                    'due_today' => 'Vencimento hoje',
+                                                    'overdue_1_day' => '1 dia em atraso'
                                                 ];
                                                 ?>
                                                 <span class="inline-flex px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
@@ -353,10 +406,20 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <label for="type" class="block text-sm font-medium text-gray-700">Tipo</label>
                             <select name="type" id="type" 
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 p-2.5">
-                                <option value="cobranca">Cobrança</option>
-                                <option value="lembrete">Lembrete</option>
-                                <option value="boas_vindas">Boas Vindas</option>
-                                <option value="custom">Personalizado</option>
+                                <optgroup label="Períodos de Notificação">
+                                    <option value="due_5_days_before">5 dias antes do vencimento</option>
+                                    <option value="due_3_days_before">3 dias antes do vencimento</option>
+                                    <option value="due_2_days_before">2 dias antes do vencimento</option>
+                                    <option value="due_1_day_before">1 dia antes do vencimento</option>
+                                    <option value="due_today">No dia do vencimento</option>
+                                    <option value="overdue_1_day">1 dia após o vencimento</option>
+                                </optgroup>
+                                <optgroup label="Tipos Clássicos">
+                                    <option value="cobranca">Cobrança</option>
+                                    <option value="lembrete">Lembrete</option>
+                                    <option value="boas_vindas">Boas Vindas</option>
+                                    <option value="custom">Personalizado</option>
+                                </optgroup>
                             </select>
                         </div>
                         

@@ -56,7 +56,14 @@ if ($_POST) {
                         'timezone' => 'string',
                         'auto_billing_enabled' => 'boolean',
                         'whatsapp_delay_seconds' => 'number',
-                        'max_retry_attempts' => 'number'
+                        'max_retry_attempts' => 'number',
+                        // Novas configurações de notificação
+                        'notify_5_days_before' => 'boolean',
+                        'notify_3_days_before' => 'boolean',
+                        'notify_2_days_before' => 'boolean',
+                        'notify_1_day_before' => 'boolean',
+                        'notify_on_due_date' => 'boolean',
+                        'notify_1_day_after_due' => 'boolean'
                     ];
                     
                     foreach ($allowed_settings as $key => $type) {
@@ -392,6 +399,107 @@ $timezones = [
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Configurações de Períodos de Notificação -->
+                                    <div class="border-t pt-6">
+                                        <h4 class="text-lg font-medium text-gray-900 mb-4">Períodos de Notificação</h4>
+                                        <p class="text-sm text-gray-600 mb-4">
+                                            Configure quando o sistema deve enviar avisos automáticos para seus clientes:
+                                        </p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_5_days_before" id="notify_5_days_before" 
+                                                           <?php echo ($all_settings['notify_5_days_before']['value'] ?? false) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_5_days_before" class="font-medium text-gray-700">
+                                                        Enviar aviso 5 dias antes
+                                                    </label>
+                                                    <p class="text-gray-500">Lembrete antecipado para o cliente se organizar</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_3_days_before" id="notify_3_days_before" 
+                                                           <?php echo ($all_settings['notify_3_days_before']['value'] ?? true) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_3_days_before" class="font-medium text-gray-700">
+                                                        Enviar aviso 3 dias antes
+                                                    </label>
+                                                    <p class="text-gray-500">Lembrete padrão recomendado</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_2_days_before" id="notify_2_days_before" 
+                                                           <?php echo ($all_settings['notify_2_days_before']['value'] ?? false) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_2_days_before" class="font-medium text-gray-700">
+                                                        Enviar aviso 2 dias antes
+                                                    </label>
+                                                    <p class="text-gray-500">Lembrete mais próximo do vencimento</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_1_day_before" id="notify_1_day_before" 
+                                                           <?php echo ($all_settings['notify_1_day_before']['value'] ?? false) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_1_day_before" class="font-medium text-gray-700">
+                                                        Enviar aviso 1 dia antes
+                                                    </label>
+                                                    <p class="text-gray-500">Último lembrete antes do vencimento</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_on_due_date" id="notify_on_due_date" 
+                                                           <?php echo ($all_settings['notify_on_due_date']['value'] ?? true) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_on_due_date" class="font-medium text-gray-700">
+                                                        Enviar aviso no dia do vencimento
+                                                    </label>
+                                                    <p class="text-gray-500">Lembrete no dia que vence</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" name="notify_1_day_after_due" id="notify_1_day_after_due" 
+                                                           <?php echo ($all_settings['notify_1_day_after_due']['value'] ?? false) ? 'checked' : ''; ?>
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="notify_1_day_after_due" class="font-medium text-gray-700">
+                                                        Enviar aviso 1 dia após vencimento
+                                                    </label>
+                                                    <p class="text-gray-500">Cobrança para pagamentos em atraso</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                                            <p class="text-sm text-blue-800">
+                                                <i class="fas fa-info-circle mr-2"></i>
+                                                <strong>Dica:</strong> Recomendamos ativar pelo menos "3 dias antes" e "no dia do vencimento" para uma cobrança eficiente. 
+                                                Evite ativar muitos períodos para não incomodar os clientes.
+                                            </p>
+                                        </div>
+                                    </div>
                                     
                                     <div class="flex justify-end space-x-3">
                                         <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
@@ -447,17 +555,18 @@ $timezones = [
                                     </div>
                                     
                                     <div>
-                                        <strong>Diretório de Uploads:</strong><br>
+                                        <strong>Períodos Ativos:</strong><br>
                                         <span class="text-gray-600">
                                             <?php 
-                                            $upload_dir = __DIR__ . '/../public/uploads';
-                                            if (!is_dir($upload_dir)) {
-                                                echo 'Não existe';
-                                            } elseif (is_writable($upload_dir)) {
-                                                echo 'Gravável';
-                                            } else {
-                                                echo 'Não gravável';
-                                            }
+                                            $active_periods = [];
+                                            if ($appSettings->isNotify5DaysBeforeEnabled()) $active_periods[] = '5 dias antes';
+                                            if ($appSettings->isNotify3DaysBeforeEnabled()) $active_periods[] = '3 dias antes';
+                                            if ($appSettings->isNotify2DaysBeforeEnabled()) $active_periods[] = '2 dias antes';
+                                            if ($appSettings->isNotify1DayBeforeEnabled()) $active_periods[] = '1 dia antes';
+                                            if ($appSettings->isNotifyOnDueDateEnabled()) $active_periods[] = 'No vencimento';
+                                            if ($appSettings->isNotify1DayAfterDueEnabled()) $active_periods[] = '1 dia após';
+                                            
+                                            echo !empty($active_periods) ? implode(', ', $active_periods) : 'Nenhum período ativo';
                                             ?>
                                         </span>
                                     </div>
@@ -469,26 +578,23 @@ $timezones = [
                         <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
                             <h4 class="text-lg font-medium text-blue-900 mb-3">
                                 <i class="fas fa-info-circle mr-2"></i>
-                                Sobre a Cobrança Automática
+                                Sobre os Períodos de Notificação
                             </h4>
                             <div class="text-sm text-blue-800 space-y-2">
                                 <p>
-                                    <strong>Como funciona:</strong> Quando ativada, o sistema executará automaticamente (via cron job) as seguintes ações:
+                                    <strong>Como funciona:</strong> O sistema verificará diariamente (via cron job) quais clientes se enquadram nos períodos configurados e enviará as mensagens automaticamente.
                                 </p>
                                 <ul class="list-disc list-inside ml-4 space-y-1">
-                                    <li>Enviar lembretes para clientes com vencimento hoje</li>
-                                    <li>Enviar avisos antecipados para clientes com vencimento em 3 dias</li>
-                                    <li>Enviar cobranças para clientes em atraso</li>
+                                    <li><strong>5 dias antes:</strong> Aviso antecipado para o cliente se organizar</li>
+                                    <li><strong>3 dias antes:</strong> Lembrete padrão (recomendado)</li>
+                                    <li><strong>2 dias antes:</strong> Lembrete mais próximo do vencimento</li>
+                                    <li><strong>1 dia antes:</strong> Último aviso antes do vencimento</li>
+                                    <li><strong>No vencimento:</strong> Lembrete no dia que vence</li>
+                                    <li><strong>1 dia após:</strong> Cobrança para pagamentos em atraso</li>
                                 </ul>
                                 <p class="mt-3">
-                                    <strong>Requisitos:</strong> Para funcionar corretamente, é necessário:
+                                    <strong>Importante:</strong> Para cada período ativo, você deve criar templates específicos na seção "Templates de Mensagem" com os tipos correspondentes.
                                 </p>
-                                <ul class="list-disc list-inside ml-4 space-y-1">
-                                    <li>Ter o WhatsApp conectado</li>
-                                    <li>Configurar templates de mensagem</li>
-                                    <li>Configurar o cron job no servidor</li>
-                                    <li>Ter clientes com datas de vencimento definidas</li>
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -548,16 +654,18 @@ $timezones = [
             }
         });
 
-        // Feedback visual para o checkbox
-        document.getElementById('auto_billing_enabled').addEventListener('change', function() {
-            const label = document.querySelector('label[for="auto_billing_enabled"]');
-            if (this.checked) {
-                label.classList.add('text-green-700');
-                label.classList.remove('text-gray-700');
-            } else {
-                label.classList.add('text-gray-700');
-                label.classList.remove('text-green-700');
-            }
+        // Feedback visual para os checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                const label = document.querySelector('label[for="' + this.id + '"]');
+                if (this.checked) {
+                    label.classList.add('text-green-700');
+                    label.classList.remove('text-gray-700');
+                } else {
+                    label.classList.add('text-gray-700');
+                    label.classList.remove('text-green-700');
+                }
+            });
         });
     </script>
 </body>

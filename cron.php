@@ -20,6 +20,7 @@ require_once __DIR__ . '/classes/Client.php';
 require_once __DIR__ . '/classes/MessageTemplate.php';
 require_once __DIR__ . '/classes/MessageHistory.php';
 require_once __DIR__ . '/classes/WhatsAppAPI.php';
+require_once __DIR__ . '/classes/AppSettings.php';
 
 // Log de início
 error_log("=== CRON JOB STARTED ===");
@@ -30,9 +31,12 @@ $stats = [
     'users_processed' => 0,
     'messages_sent' => 0,
     'messages_failed' => 0,
+    'clients_5_days_before' => 0,
+    'clients_3_days_before' => 0,
+    'clients_2_days_before' => 0,
+    'clients_1_day_before' => 0,
     'clients_due_today' => 0,
-    'clients_due_soon' => 0,
-    'clients_overdue' => 0,
+    'clients_1_day_overdue' => 0,
     'errors' => []
 ];
 
@@ -51,6 +55,13 @@ try {
     $template = new MessageTemplate($db);
     $messageHistory = new MessageHistory($db);
     $whatsapp = new WhatsAppAPI();
+    $appSettings = new AppSettings($db);
+    
+    // Verificar se a cobrança automática está ativa
+    if (!$appSettings->isAutoBillingEnabled()) {
+        error_log("Auto billing is disabled, skipping cron job");
+        exit(0);
+    }
     
     // Buscar todos os usuários com WhatsApp conectado
     $users_stmt = $user->readAll();
@@ -73,69 +84,136 @@ try {
                 continue;
             }
             
-            // 1. Clientes com vencimento hoje
-            $due_today_stmt = $client->getClientsWithUpcomingDueDate($user_id, 0);
-            $due_today_clients = $due_today_stmt->fetchAll(PDO::FETCH_ASSOC);
-            $stats['clients_due_today'] += count($due_today_clients);
-            
-            foreach ($due_today_clients as $client_data) {
-                $message_sent = sendAutomaticMessage(
-                    $whatsapp, $template, $messageHistory, 
-                    $user_id, $client_data, $instance_name, 
-                    'lembrete', 'Lembrete de Vencimento'
-                );
+            // 1. Clientes com vencimento em 5 dias (se habilitado)
+            if ($appSettings->isNotify5DaysBeforeEnabled()) {
+                $clients_5_days = $client->getClientsDueInDays($user_id, 5)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_5_days_before'] += count($clients_5_days);
                 
-                if ($message_sent) {
-                    $stats['messages_sent']++;
-                } else {
-                    $stats['messages_failed']++;
+                foreach ($clients_5_days as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'due_5_days_before', 'Aviso 5 dias antes'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    // Delay entre mensagens
+                    sleep($appSettings->getWhatsAppDelay());
                 }
             }
             
-            // 2. Clientes com vencimento em 3 dias
-            $due_soon_stmt = $client->getClientsWithUpcomingDueDate($user_id, 3);
-            $due_soon_clients = $due_soon_stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Filtrar apenas os que vencem em exatamente 3 dias
-            $due_in_3_days = array_filter($due_soon_clients, function($client_data) {
-                $due_date = new DateTime($client_data['due_date']);
-                $today = new DateTime();
-                $diff = $today->diff($due_date);
-                return !$diff->invert && $diff->days == 3;
-            });
-            
-            $stats['clients_due_soon'] += count($due_in_3_days);
-            
-            foreach ($due_in_3_days as $client_data) {
-                $message_sent = sendAutomaticMessage(
-                    $whatsapp, $template, $messageHistory, 
-                    $user_id, $client_data, $instance_name, 
-                    'lembrete', 'Lembrete Antecipado'
-                );
+            // 2. Clientes com vencimento em 3 dias (se habilitado)
+            if ($appSettings->isNotify3DaysBeforeEnabled()) {
+                $clients_3_days = $client->getClientsDueInDays($user_id, 3)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_3_days_before'] += count($clients_3_days);
                 
-                if ($message_sent) {
-                    $stats['messages_sent']++;
-                } else {
-                    $stats['messages_failed']++;
+                foreach ($clients_3_days as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'due_3_days_before', 'Aviso 3 dias antes'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    sleep($appSettings->getWhatsAppDelay());
                 }
             }
             
-            // 3. Clientes em atraso
-            $overdue_stmt = $client->getOverdueClients($user_id);
-            $overdue_clients = $overdue_stmt->fetchAll(PDO::FETCH_ASSOC);
-            $stats['clients_overdue'] += count($overdue_clients);
-            
-            foreach ($overdue_clients as $client_data) {
-                $message_sent = sendAutomaticMessage(
-                    $whatsapp, $template, $messageHistory, 
-                    $user_id, $client_data, $instance_name, 
-                    'cobranca', 'Cobrança em Atraso'
-                );
+            // 3. Clientes com vencimento em 2 dias (se habilitado)
+            if ($appSettings->isNotify2DaysBeforeEnabled()) {
+                $clients_2_days = $client->getClientsDueInDays($user_id, 2)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_2_days_before'] += count($clients_2_days);
                 
-                if ($message_sent) {
-                    $stats['messages_sent']++;
-                } else {
-                    $stats['messages_failed']++;
+                foreach ($clients_2_days as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'due_2_days_before', 'Aviso 2 dias antes'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    sleep($appSettings->getWhatsAppDelay());
+                }
+            }
+            
+            // 4. Clientes com vencimento em 1 dia (se habilitado)
+            if ($appSettings->isNotify1DayBeforeEnabled()) {
+                $clients_1_day = $client->getClientsDueInDays($user_id, 1)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_1_day_before'] += count($clients_1_day);
+                
+                foreach ($clients_1_day as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'due_1_day_before', 'Aviso 1 dia antes'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    sleep($appSettings->getWhatsAppDelay());
+                }
+            }
+            
+            // 5. Clientes com vencimento hoje (se habilitado)
+            if ($appSettings->isNotifyOnDueDateEnabled()) {
+                $clients_today = $client->getClientsDueToday($user_id)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_due_today'] += count($clients_today);
+                
+                foreach ($clients_today as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'due_today', 'Vencimento hoje'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    sleep($appSettings->getWhatsAppDelay());
+                }
+            }
+            
+            // 6. Clientes com 1 dia de atraso (se habilitado)
+            if ($appSettings->isNotify1DayAfterDueEnabled()) {
+                $clients_1_day_overdue = $client->getClientsOverdueDays($user_id, 1)->fetchAll(PDO::FETCH_ASSOC);
+                $stats['clients_1_day_overdue'] += count($clients_1_day_overdue);
+                
+                foreach ($clients_1_day_overdue as $client_data) {
+                    $message_sent = sendAutomaticMessage(
+                        $whatsapp, $template, $messageHistory, 
+                        $user_id, $client_data, $instance_name, 
+                        'overdue_1_day', 'Atraso 1 dia'
+                    );
+                    
+                    if ($message_sent) {
+                        $stats['messages_sent']++;
+                    } else {
+                        $stats['messages_failed']++;
+                    }
+                    
+                    sleep($appSettings->getWhatsAppDelay());
                 }
             }
             
@@ -148,6 +226,9 @@ try {
         }
     }
     
+    // Atualizar última execução do cron
+    $appSettings->updateCronLastRun();
+    
 } catch (Exception $e) {
     error_log("Critical error in cron job: " . $e->getMessage());
     $stats['errors'][] = "Erro crítico: " . $e->getMessage();
@@ -158,9 +239,12 @@ error_log("=== CRON JOB COMPLETED ===");
 error_log("Users processed: " . $stats['users_processed']);
 error_log("Messages sent: " . $stats['messages_sent']);
 error_log("Messages failed: " . $stats['messages_failed']);
+error_log("Clients 5 days before: " . $stats['clients_5_days_before']);
+error_log("Clients 3 days before: " . $stats['clients_3_days_before']);
+error_log("Clients 2 days before: " . $stats['clients_2_days_before']);
+error_log("Clients 1 day before: " . $stats['clients_1_day_before']);
 error_log("Clients due today: " . $stats['clients_due_today']);
-error_log("Clients due soon: " . $stats['clients_due_soon']);
-error_log("Clients overdue: " . $stats['clients_overdue']);
+error_log("Clients 1 day overdue: " . $stats['clients_1_day_overdue']);
 error_log("Errors: " . count($stats['errors']));
 
 // Enviar email de relatório para o administrador
@@ -180,13 +264,25 @@ function sendAutomaticMessage($whatsapp, $template, $messageHistory, $user_id, $
             $message_text = $template->message;
             $template_id = $template->id;
         } else {
-            // Template padrão se não encontrar
+            // Templates padrão se não encontrar
             switch ($template_type) {
-                case 'lembrete':
-                    $message_text = "Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Obrigado!";
+                case 'due_5_days_before':
+                    $message_text = "Olá {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam 5 dias! 😊";
                     break;
-                case 'cobranca':
-                    $message_text = "Olá {nome}! Sua mensalidade de {valor} está em atraso desde {vencimento}. Por favor, regularize o pagamento.";
+                case 'due_3_days_before':
+                    $message_text = "Olá {nome}! Lembrando que sua mensalidade de {valor} vence em {vencimento}. Faltam 3 dias!";
+                    break;
+                case 'due_2_days_before':
+                    $message_text = "Atenção, {nome}! Sua mensalidade de {valor} vence em {vencimento}. Faltam apenas 2 dias! 🔔";
+                    break;
+                case 'due_1_day_before':
+                    $message_text = "Último lembrete, {nome}! Sua mensalidade de {valor} vence amanhã, {vencimento}. Realize o pagamento para evitar interrupções. 🗓️";
+                    break;
+                case 'due_today':
+                    $message_text = "Olá {nome}! Sua mensalidade de {valor} vence hoje, {vencimento}. Por favor, efetue o pagamento. Agradecemos! 🙏";
+                    break;
+                case 'overdue_1_day':
+                    $message_text = "Atenção, {nome}! Sua mensalidade de {valor} venceu ontem, {vencimento}. Por favor, regularize o pagamento o quanto antes para evitar juros. 🚨";
                     break;
                 default:
                     $message_text = "Olá {nome}! Entre em contato conosco sobre sua mensalidade.";
@@ -270,10 +366,13 @@ function sendAdminReport($stats) {
                 </div>
                 
                 <div class='stats'>
-                    <h3>Clientes Identificados</h3>
+                    <h3>Clientes por Período de Notificação</h3>
+                    <p><strong>5 dias antes:</strong> {$stats['clients_5_days_before']}</p>
+                    <p><strong>3 dias antes:</strong> {$stats['clients_3_days_before']}</p>
+                    <p><strong>2 dias antes:</strong> {$stats['clients_2_days_before']}</p>
+                    <p><strong>1 dia antes:</strong> {$stats['clients_1_day_before']}</p>
                     <p><strong>Vencimento hoje:</strong> {$stats['clients_due_today']}</p>
-                    <p><strong>Vencimento em 3 dias:</strong> {$stats['clients_due_soon']}</p>
-                    <p><strong>Em atraso:</strong> {$stats['clients_overdue']}</p>
+                    <p><strong>1 dia em atraso:</strong> {$stats['clients_1_day_overdue']}</p>
                 </div>";
         
         if (!empty($stats['errors'])) {
